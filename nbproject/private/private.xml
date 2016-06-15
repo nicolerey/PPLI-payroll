@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+        <file>
+            <url>application/views/users/listing.php</url>
+            <bookmark id="1">
+                <name/>
+                <line>43</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/views/users/manage.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/views/items/manage.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/views/home.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/helpers/cesform_helper.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/controllers/Home.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/views/users/listing.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/views/items/listing.php</file>
+            <file>file:/C:/xampp/htdocs/ebarangay/application/controllers/Items.php</file>
+        </group>
+    </open-files>
+</project-private>

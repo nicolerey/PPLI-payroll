@@ -1,0 +1,16 @@
+.login-logo img{
+	display: block;
+    width: 35%;
+    margin: 10px auto;
+}
+.login-box{
+	margin: 4% auto;
+	width: 400px;
+}
+.login-box-msg, .register-box-msg {
+    margin: 0;
+    text-align: center;
+    padding: 0 10px 20px 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
