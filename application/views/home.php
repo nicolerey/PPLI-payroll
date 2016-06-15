@@ -3,9 +3,6 @@
     Dashboard
     <small></small>
   </h1>
-  <ol class="breadcrumb">
-    <li class="active"><a><i class="fa fa-dashboard"></i> Dashboard</a></li>
-  </ol>
 </section>
 <section class="content">
 

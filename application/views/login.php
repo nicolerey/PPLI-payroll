@@ -21,12 +21,12 @@
     <![endif]-->
   </head>
   <body class="hold-transition login-page">
-    <div class="login-box">
+    <div class="login-box" style="width: 475px;">
       <div class="login-logo">
-        <a ><b>SEA</b> Olympus</a>
+        <a>Pinnacle Poultry & Livestock Inc.</a>
       </div><!-- /.login-logo -->
       <div class="login-box-body">
-        <p class="login-box-msg">HR Online System</p>
+        <p class="login-box-msg">Online Payroll System</p>
         <div class="alert alert-danger hidden">
           <ul class="list-unstyled">
             

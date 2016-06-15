@@ -168,16 +168,17 @@
         </div>
         <div class="row">
           <div class="row">
-            <label class="col-sm-8 control-label text-danger"> Deductions:</label>
+            <label class="col-sm-7 control-label text-danger"> Deductions:</label>
           </div>
           <div class="row">
-            <div class="col-sm-7"></div>
-            <div class="col-sm-4">
+            <div class="col-sm-6"></div>
+            <div class="col-sm-5">
               <table class="table table-hover table-striped text-danger">
                 <thead>
                   <tr>
                     <th class="col-sm-1"></th>
-                    <th class="col-sm-6">Particulars</th>
+                    <th class="col-sm-5">Particulars</th>
+                    <th class="2">Rate type</th>
                     <th class="col-sm-3">Amount</th>
                   </tr>
                 </thead>
@@ -194,6 +195,7 @@
                         <tr>
                           <td></td>
                           <td><?= $deductions['name'];?></td>
+                          <td><?= $ded_type;?></td>
                           <td>
                             <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
                             <?php if($key!=='loan'):?>
@@ -207,6 +209,7 @@
                           <tr>
                             <td></td>
                             <td>Loan Payment - <?= $loan['payment_date'];?></td>
+                            <td>-</td>
                             <td class="loan_payment_amount"><?= $loan['payment_amount'];?></td>
                           </tr>
                         <?php endforeach;?>
@@ -220,17 +223,18 @@
                       </button>
                     </td>
                     <td>
-                      <select class="form-control deduction_name">
+                      <select class="form-control deduction_name" onchange="change_particular_type(this);">
                         <option value=""></option>
                         <?php if(!empty($particulars)):?>
                           <?php foreach($particulars as $particular):?>
                             <?php if($particular['type']==='d'):?>
-                              <option value="<?= $particular['id'];?>"><?= $particular['name'];?></option>
+                              <option value="<?= $particular['id'];?>" rate_type="<?= $particular['particular_type'];?>"><?= $particular['name'];?></option>
                             <?php endif;?>
                           <?php endforeach;?>
                         <?php endif;?>
                       </select>
                     </td>
+                    <td class="particular_rate_type">-</td>
                     <td>
                       <input name=""  min="0" step="0.01" value="0" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"/>
                     </td>

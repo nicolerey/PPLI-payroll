@@ -39,9 +39,9 @@
         <!-- Logo -->
         <a class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
-          <span class="logo-mini"><b>Payroll</b></span>
+          <span class="logo-mini"><b>PPLI</b></span>
           <!-- logo for regular state and mobile devices -->
-          <span class="logo-lg"><b>Payroll</b></span>
+          <span class="logo-lg"><b>PPLI</b>-Payroll System</span>
         </a>
 
         <!-- Header Navbar -->
@@ -100,7 +100,7 @@
       <!-- Main Footer -->
       <footer class="main-footer">
         <!-- Default to the left -->
-        Payroll System &copy; 2016
+        Pinnacle Poultry & Livestock Inc. - Payroll System &copy; 2016
       </footer>
 
     </div><!-- ./wrapper -->
