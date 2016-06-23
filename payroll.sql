@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 15, 2016 at 02:50 PM
+-- Generation Time: Jun 23, 2016 at 03:08 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 7.0.5
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `seaolympus`
+-- Database: `payroll`
 --
 
 -- --------------------------------------------------------
@@ -37,7 +37,8 @@ CREATE TABLE `departments` (
 --
 
 INSERT INTO `departments` (`id`, `id_number`, `name`) VALUES
-(6, 1, 'VP');
+(6, 1, 'VP'),
+(7, 2, 'sadsdas');
 
 -- --------------------------------------------------------
 
@@ -88,10 +89,6 @@ CREATE TABLE `employees` (
   `tin_number` varchar(45) COLLATE utf8_bin NOT NULL,
   `rfid_uid` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `password` varchar(45) COLLATE utf8_bin DEFAULT NULL,
-  `daily_rate` decimal(15,2) DEFAULT NULL,
-  `overtime_rate` decimal(15,2) DEFAULT NULL,
-  `allowed_late_period` decimal(15,2) DEFAULT NULL,
-  `late_penalty` decimal(15,2) DEFAULT NULL,
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
   `account_type` enum('em','ad','pm') COLLATE utf8_bin NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -101,8 +98,9 @@ CREATE TABLE `employees` (
 -- Dumping data for table `employees`
 --
 
-INSERT INTO `employees` (`id`, `id_number`, `firstname`, `middleinitial`, `lastname`, `birthdate`, `birthplace`, `gender`, `civil_status`, `nationality`, `religion`, `full_address`, `email_address`, `mobile_number`, `date_hired`, `login_password`, `sss_number`, `pagibig_number`, `tin_number`, `rfid_uid`, `password`, `daily_rate`, `overtime_rate`, `allowed_late_period`, `late_penalty`, `is_locked`, `account_type`, `created_at`) VALUES
-(3, 2, 'JULITO', 'G', 'CASTANEDA', '1995-06-20', 'Cebu City', 'M', 'w', 'Filipino', 'Roman Catholic', 'Mandaue City, Cebu', 'natabioadr@gmail.com', '09434524412', '2016-12-15', NULL, '1232', '13', 'ss', '00000003', '21232f297a57a5a743894a0e4a801fc3', '560.00', '150.00', '15.00', '15.00', 0, 'ad', '2016-01-17 02:07:01');
+INSERT INTO `employees` (`id`, `id_number`, `firstname`, `middleinitial`, `lastname`, `birthdate`, `birthplace`, `gender`, `civil_status`, `nationality`, `religion`, `full_address`, `email_address`, `mobile_number`, `date_hired`, `login_password`, `sss_number`, `pagibig_number`, `tin_number`, `rfid_uid`, `password`, `is_locked`, `account_type`, `created_at`) VALUES
+(3, 2, 'JULITO', 'G', 'CASTANEDA', '1995-06-20', 'Cebu City', 'M', 'w', 'Filipino', 'Roman Catholic', 'Mandaue City, Cebu', 'natabioadr@gmail.com', '09434524412', '2016-12-15', NULL, '1232', '13', 'ss', '00000003', '21232f297a57a5a743894a0e4a801fc3', 0, 'ad', '2016-01-17 02:07:01'),
+(4, NULL, 'dasdas', 'dsadas', 'dsadsad', '2016-06-20', '', 'M', 'sg', '', '', '', 'nicolereya@gmail.com', '09234251308', '2016-06-21', NULL, '12345', '123456', '', NULL, '21232f297a57a5a743894a0e4a801fc3', 0, 'pm', '2016-06-22 03:52:37');
 
 -- --------------------------------------------------------
 
@@ -150,7 +148,8 @@ CREATE TABLE `employee_departments` (
 --
 
 INSERT INTO `employee_departments` (`id`, `department_id`, `employee_id`, `from`, `to`) VALUES
-(41, 6, 3, '2016-05-15', NULL);
+(41, 6, 3, '2016-05-15', NULL),
+(42, 6, 4, '2016-06-22', NULL);
 
 -- --------------------------------------------------------
 
@@ -171,7 +170,8 @@ CREATE TABLE `employee_positions` (
 --
 
 INSERT INTO `employee_positions` (`id`, `employee_id`, `position_id`, `from`, `to`) VALUES
-(50, 3, 8, '2016-05-15', NULL);
+(50, 3, 8, '2016-05-15', NULL),
+(51, 4, 8, '2016-06-22', NULL);
 
 -- --------------------------------------------------------
 
@@ -256,6 +256,9 @@ CREATE TABLE `payroll` (
   `wage_adjustment` decimal(13,2) DEFAULT '0.00',
   `current_late_penalty` decimal(13,2) DEFAULT '0.00',
   `overtime_pay` decimal(13,2) DEFAULT '0.00',
+  `batch_id` int(10) NOT NULL,
+  `approval_status` tinyint(1) NOT NULL DEFAULT '0',
+  `approved_by` int(10) UNSIGNED DEFAULT NULL,
   `created_by` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -263,10 +266,10 @@ CREATE TABLE `payroll` (
 -- Dumping data for table `payroll`
 --
 
-INSERT INTO `payroll` (`id`, `employee_id`, `start_date`, `end_date`, `days_rendered`, `overtime_hours_rendered`, `late_minutes`, `current_daily_wage`, `daily_wage_units`, `wage_adjustment`, `current_late_penalty`, `overtime_pay`, `created_by`) VALUES
-(32, 3, '2016-05-01', '2016-05-15', 1, 1, 0, '560.00', 0, '0.00', '15.00', '840.00', 3),
-(34, 3, '2016-06-01', '2016-06-15', 1, 0, 0, '560.00', 0, '0.00', '15.00', '0.00', 3),
-(42, 3, '2016-06-16', '2016-06-30', 1, 0, 0, '560.00', 0, '0.00', '15.00', '0.00', 3);
+INSERT INTO `payroll` (`id`, `employee_id`, `start_date`, `end_date`, `days_rendered`, `overtime_hours_rendered`, `late_minutes`, `current_daily_wage`, `daily_wage_units`, `wage_adjustment`, `current_late_penalty`, `overtime_pay`, `batch_id`, `approval_status`, `approved_by`, `created_by`) VALUES
+(49, 3, '2016-06-16', '2016-06-30', 1, 0, 0, '110001.11', 1, '0.00', '11.11', '0.00', 3, 1, 3, 3),
+(51, 3, '2016-06-17', '2016-06-25', 1, 0, 0, '11111.11', 0, '0.00', '11.11', '0.00', 5, 0, NULL, 4),
+(53, 3, '2016-06-20', '2016-06-25', 1, 0, 0, '11.11', 0, '0.00', '11.11', '0.00', 7, 1, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -278,7 +281,7 @@ CREATE TABLE `payroll_particulars` (
   `id` int(10) UNSIGNED NOT NULL,
   `payroll_id` int(10) UNSIGNED NOT NULL,
   `particulars_id` int(10) UNSIGNED NOT NULL,
-  `units` int(11) NOT NULL,
+  `units` int(11) NOT NULL DEFAULT '1',
   `amount` decimal(13,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -287,13 +290,13 @@ CREATE TABLE `payroll_particulars` (
 --
 
 INSERT INTO `payroll_particulars` (`id`, `payroll_id`, `particulars_id`, `units`, `amount`) VALUES
-(46, 32, 4, 0, '11.11'),
-(47, 32, 5, 0, '100.00'),
-(50, 34, 4, 0, '11.11'),
-(51, 34, 5, 0, '100.00'),
-(52, 34, 6, 0, '10.00'),
-(67, 42, 4, 0, '11.11'),
-(68, 42, 5, 0, '100.00');
+(81, 49, 4, 0, '111.11'),
+(82, 49, 5, 1, '11111.11'),
+(83, 49, 6, 1, '11111.11'),
+(84, 51, 5, 1, '11.11'),
+(85, 51, 6, 1, '1.11'),
+(86, 51, 4, 1, '11.11'),
+(88, 53, 5, 1, '11.11');
 
 -- --------------------------------------------------------
 
@@ -305,17 +308,18 @@ CREATE TABLE `pay_modifiers` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(50) COLLATE utf8_bin NOT NULL,
   `particular_type` enum('d','m') COLLATE utf8_bin NOT NULL COMMENT 'd - daily     m - monthly',
-  `type` enum('a','d') COLLATE utf8_bin NOT NULL COMMENT 'a - additional\nd - deductions'
+  `type` enum('a','d') COLLATE utf8_bin NOT NULL COMMENT 'a - additional\nd - deductions',
+  `allow_pm` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Dumping data for table `pay_modifiers`
 --
 
-INSERT INTO `pay_modifiers` (`id`, `name`, `particular_type`, `type`) VALUES
-(4, 'SSS', 'd', 'd'),
-(5, 'Bonus', 'd', 'a'),
-(6, 'trial', 'm', 'a');
+INSERT INTO `pay_modifiers` (`id`, `name`, `particular_type`, `type`, `allow_pm`) VALUES
+(4, 'SSS', 'd', 'd', 0),
+(5, 'Bonus', 'd', 'a', 0),
+(6, 'trial', 'm', 'a', 0);
 
 -- --------------------------------------------------------
 
@@ -327,16 +331,20 @@ CREATE TABLE `positions` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) COLLATE utf8_bin NOT NULL,
   `attendance_type` enum('re','fl') COLLATE utf8_bin DEFAULT NULL,
-  `workday` text COLLATE utf8_bin NOT NULL
+  `workday` text COLLATE utf8_bin NOT NULL,
+  `daily_rate` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `overtime_rate` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `allowed_late_period` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `late_penalty` decimal(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Dumping data for table `positions`
 --
 
-INSERT INTO `positions` (`id`, `name`, `attendance_type`, `workday`) VALUES
-(8, 'HR', 're', '[{"day":"3","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8},{"day":"4","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8},{"day":"5","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8}]'),
-(9, 'asddasdasdasdas', 're', '[{"day":"1","time":{"from_time_1":"1:15 AM","to_time_1":"2:15 AM","from_time_2":"1:15 PM","to_time_2":"2:15 AM"},"first_hours":1,"second_hours":11,"total_working_hours":12}]');
+INSERT INTO `positions` (`id`, `name`, `attendance_type`, `workday`, `daily_rate`, `overtime_rate`, `allowed_late_period`, `late_penalty`) VALUES
+(8, 'HR', 're', '[{"day":"3","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8},{"day":"4","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8},{"day":"5","time":{"from_time_1":"8:00 AM","to_time_1":"12:00 PM","from_time_2":"1:00 PM","to_time_2":"5:00 PM"},"first_hours":4,"second_hours":4,"total_working_hours":8}]', '11.11', '11.11', '11.11', '11.11'),
+(9, 'asddasdasdasdas', 're', '[{"day":"1","time":{"from_time_1":"1:15 AM","to_time_1":"2:15 AM","from_time_2":"1:15 PM","to_time_2":"2:15 AM"},"first_hours":1,"second_hours":11,"total_working_hours":12}]', '0.00', '0.00', '0.00', '0.00');
 
 -- --------------------------------------------------------
 
@@ -345,7 +353,8 @@ INSERT INTO `positions` (`id`, `name`, `attendance_type`, `workday`) VALUES
 --
 
 CREATE TABLE `salary_particulars` (
-  `employee_id` int(10) UNSIGNED NOT NULL,
+  `id` int(10) UNSIGNED NOT NULL,
+  `position_id` int(10) UNSIGNED NOT NULL,
   `particulars_id` int(10) UNSIGNED NOT NULL,
   `amount` decimal(15,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -354,10 +363,9 @@ CREATE TABLE `salary_particulars` (
 -- Dumping data for table `salary_particulars`
 --
 
-INSERT INTO `salary_particulars` (`employee_id`, `particulars_id`, `amount`) VALUES
-(3, 4, '11.11'),
-(3, 5, '100.00'),
-(3, 6, '10.00');
+INSERT INTO `salary_particulars` (`id`, `position_id`, `particulars_id`, `amount`) VALUES
+(10, 8, 5, '11.11'),
+(11, 8, 6, '11.11');
 
 --
 -- Indexes for dumped tables
@@ -443,7 +451,8 @@ ALTER TABLE `payment_terms`
 ALTER TABLE `payroll`
   ADD PRIMARY KEY (`id`),
   ADD KEY `payroll_created_by_foreign_idx` (`created_by`),
-  ADD KEY `payroll_employee_id_foreign_idx` (`employee_id`);
+  ADD KEY `payroll_employee_id_foreign_idx` (`employee_id`),
+  ADD KEY `approved_by` (`approved_by`);
 
 --
 -- Indexes for table `payroll_particulars`
@@ -471,8 +480,9 @@ ALTER TABLE `positions`
 -- Indexes for table `salary_particulars`
 --
 ALTER TABLE `salary_particulars`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `salary_particulars_particulars_id_foreign_idx` (`particulars_id`),
-  ADD KEY `salary_particulars_employee_id_foreign_idx` (`employee_id`);
+  ADD KEY `salary_particulars_employee_id_foreign_idx` (`position_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -482,7 +492,7 @@ ALTER TABLE `salary_particulars`
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `department_supervisors`
 --
@@ -492,7 +502,7 @@ ALTER TABLE `department_supervisors`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `employee_attendance`
 --
@@ -502,12 +512,12 @@ ALTER TABLE `employee_attendance`
 -- AUTO_INCREMENT for table `employee_departments`
 --
 ALTER TABLE `employee_departments`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 --
 -- AUTO_INCREMENT for table `employee_positions`
 --
 ALTER TABLE `employee_positions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 --
 -- AUTO_INCREMENT for table `employee_requests`
 --
@@ -527,12 +537,12 @@ ALTER TABLE `payment_terms`
 -- AUTO_INCREMENT for table `payroll`
 --
 ALTER TABLE `payroll`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 --
 -- AUTO_INCREMENT for table `payroll_particulars`
 --
 ALTER TABLE `payroll_particulars`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 --
 -- AUTO_INCREMENT for table `pay_modifiers`
 --
@@ -544,6 +554,11 @@ ALTER TABLE `pay_modifiers`
 ALTER TABLE `positions`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
+-- AUTO_INCREMENT for table `salary_particulars`
+--
+ALTER TABLE `salary_particulars`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+--
 -- Constraints for dumped tables
 --
 
@@ -552,16 +567,16 @@ ALTER TABLE `positions`
 --
 ALTER TABLE `department_supervisors`
   ADD CONSTRAINT `department_supervisors_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `department_supervisors_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `department_supervisors_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `employee_attendance`
 --
 ALTER TABLE `employee_attendance`
-  ADD CONSTRAINT `employee_attendance_created_by` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `employee_attendance_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `employee_attendance_last_approved_by` FOREIGN KEY (`last_approved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `employee_attendance_last_updated_by` FOREIGN KEY (`last_updated_by`) REFERENCES `employees` (`id`),
+  ADD CONSTRAINT `employee_attendance_created_by` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `employee_attendance_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `employee_attendance_last_approved_by` FOREIGN KEY (`last_approved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `employee_attendance_last_updated_by` FOREIGN KEY (`last_updated_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `employee_attendance_request_id_foreign` FOREIGN KEY (`request_id`) REFERENCES `employee_requests` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
@@ -596,6 +611,7 @@ ALTER TABLE `payment_terms`
 -- Constraints for table `payroll`
 --
 ALTER TABLE `payroll`
+  ADD CONSTRAINT `payroll_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `payroll_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON UPDATE NO ACTION,
   ADD CONSTRAINT `payroll_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
@@ -610,8 +626,8 @@ ALTER TABLE `payroll_particulars`
 -- Constraints for table `salary_particulars`
 --
 ALTER TABLE `salary_particulars`
-  ADD CONSTRAINT `salary_particulars_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `salary_particulars_particulars_id_foreign` FOREIGN KEY (`particulars_id`) REFERENCES `pay_modifiers` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `salary_particulars_particulars_id_foreign` FOREIGN KEY (`particulars_id`) REFERENCES `pay_modifiers` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `salary_particulars_position_id_foreign` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
