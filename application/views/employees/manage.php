@@ -41,7 +41,7 @@
               </div>
             </div>
 
-            <div class="password_fields"<?= ($data['account_type']!="ad" && $data['account_type']!="pm")?"style='display: none;'":"";?>>
+            <div class="password_fields"<?= (isset($data['account_type']) && $data['account_type']!="ad" && $data['account_type']!="pm")?"style='display: none;'":"";?>>
               <?php if($mode!==MODE_CREATE):?>
                 <div class="form-group">              
                   <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> User password</label>
@@ -172,58 +172,6 @@
               </div>
             </div>
             <hr>
-          <div class="form-group">
-            <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Daily wage</label>
-            <div class="col-sm-3">
-              <input name="daily_rate"  min="0" step="0.01" value="<?= number_format(preset($data, 'daily_rate', 0), 2)?>" class="form-control pformat"/>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Overtime rate</label>
-            <div class="col-sm-3">
-              <div class="input-group">
-                <input type="text" class="form-control"  name="overtime_rate" value="<?= preset($data, 'overtime_rate', 0)?>" aria-describedby="basic-addon2">
-                <span class="input-group-addon" id="basic-addon2">%</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Allowed late period</label>
-            <div class="col-sm-3">
-              <input name="allowed_late_period" min="0" step="0.01" value="<?= preset($data, 'allowed_late_period', 0)?>" class="form-control"/>
-              <span class="help-block">in minutes</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Late penalty</label>
-            <div class="col-sm-3">
-              <input name="late_penalty" min="0" step="0.01" value="<?= preset($data, 'late_penalty', 0)?>" class="form-control pformat"/>
-              <span class="help-block">per minute</span>
-            </div>
-          </div>
-          <table class="table" id="particulars">
-            <thead><tr class="active"><th>Particulars</th><th>Amount</th><th></th></tr></thead>
-            <tbody>
-              <?php if(isset($data['particulars']) && $data['particulars']):?>
-                <?php foreach($data['particulars'] AS $key => $row):?>
-                  <tr>
-                    <td><?= form_dropdown("particulars[{$key}][particulars_id]", ['' => ''] + $particulars, $row['particulars_id'], 'class="form-control" data-name="particulars[idx][particulars_id]"')?></td>
-                    <td><input type="text" class="form-control pformat" data-name="particulars[idx][amount]" name="particulars[<?=$key?>][amount]" value="<?= number_format($row['amount'], 2)?>" /></td>
-                    <td><a class="btn btn-flat btn-danger btn-sm remove"><i class="fa fa-times"></i></a></td>
-                  </tr>
-                <?php endforeach;?>
-              <?php else:?>
-                <tr>
-                    <td><?= form_dropdown("particulars[0][particulars_id]", ['' => ''] + $particulars, FALSE, 'class="form-control" data-name="particulars[idx][particulars_id]"')?></td>
-                    <td><input type="text" class="form-control pformat" data-name="particulars[idx][amount]" name="particulars[0][amount]"/></td>
-                    <td><a class="btn btn-flat btn-danger btn-sm remove"><i class="fa fa-times"></i></a></td>
-                  </tr>
-              <?php endif;?>
-            </tbody>
-            <tfoot>
-              <tr><td colspan="3"><a id="add-particulars" class="btn btn-default btn-flat btn-sm"><i class="fa fa-plus"></i> Add new line</a></td></tr>
-            </tfoot>
-          </table>
           <input type="hidden" data-name="index"  data-value="<?= isset($data['particulars']) &&  $data['particulars'] ? count($data['particulars']) : 1?>"/>
             <a href="<?=$url?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
             <button type="submit" class="btn btn-success btn-flat">Submit</button>

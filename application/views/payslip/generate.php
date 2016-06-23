@@ -12,7 +12,7 @@
     <div class="box-header with-border">
       <h3 class="box-title"><?= $title ?></h3>
     </div>
-      <form class="form-horizontal" action="<?= "{$url}/generate"?>" method="GET" onsubmit="return confirm('Are you sure?')">
+      <form class="form-horizontal" action="<?= "{$url}/generate"?>" method="POST" onsubmit="return confirm('Are you sure?')">
       <div class="box-body">
         <div class="alert alert-info"><p>Fields marked with <span class="fa fa-asterisk text-danger"></span> are required.</p></div>
         <div class="alert alert-danger hidden"><ul class="list-unstyled"></ul></div>
@@ -20,15 +20,20 @@
           <div class="alert alert-success"><?= $num?> payroll(s) has been created!</div>
         <?php endif;?>
         <div class="form-group">
-          <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Employee</label>
+          <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Department</label>
           <div class="col-sm-5">
-            <?= form_dropdown('employee_number', [ 'all' => '*All employees*' ]+ $employees, FALSE, 'class="form-control" required="required"')?>
+            <?= form_dropdown('department_id', ['' => ''] + $departments, FALSE, 'class="form-control" required="required"')?>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Month</label>
-          <div class="col-sm-4">
-            <?= form_dropdown('month', ['' => '', 1  => 'First half', 2 => 'Second half'], FALSE, 'class="form-control" required="required" ')?>
+          <div class="col-sm-2">
+            <input type="text" class="form-control datepicker" name="from_date"/>
+            <span class="help-block">Start date</span>
+          </div>
+          <div class="col-sm-2">
+            <input type="text" class="form-control datepicker" name="to_date"/>
+            <span class="help-block">End date</span>
           </div>
         <!-- <div class=> -->
       </div><!-- /.box-body -->

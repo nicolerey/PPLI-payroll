@@ -25,7 +25,16 @@
         <div class="alert alert-danger hidden"><ul class="list-unstyled"></ul></div>
 
         <div class="form-group">
-          <div class="col-sm-8"></div>
+          <label class="col-sm-2 control-label"> Status</label>
+          <div class="col-sm-1">
+            <p class="form-control-static approval_status"><?= ($payslip['approval_status'])?'Approved':'Pending';?></p>
+          </div>
+          <div class="col-sm-3">
+            <?php if(!$payslip['approval_status'] && $this->session->userdata('account_type')=='ad'):?>
+              <button type="button" class="btn btn-flat btn-success btn-sm" id="approve_button" data-action="<?= base_url('my_payslip/approve_payslip')?>" data-pk="<?= $payslip['id'];?>"><i class="fa fa-check"></i> Approve payslip</button>
+            <?php endif;?>
+          </div>
+          <div class="col-sm-2"></div>
           <label class="col-sm-2 control-label"> Date</label>
           <div class="col-sm-2">
             <p class="form-control-static"><?= date('Y-m-d');?></p>
@@ -55,7 +64,6 @@
                   <th class="col-sm-2">Rate type</th>
                   <th class="col-sm-2">Rate</th>
                   <th class="col-sm-1">No. of days</th>
-                  <th class="col-sm-1">No. of units</th>
                   <th class="col-sm-2">Amount</th>
                 </tr>
               </thead>
@@ -68,9 +76,6 @@
                     <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 0);" value="<?= $payslip['current_daily_wage'];?>"/>
                   </td>
                   <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
-                  <td>
-                    <input type="number" class="form-control particular_unit" value="<?= $payslip['daily_wage_units'];?>" onchange="calculate_particular_amount(this, 0);" name="basic_rate_units[]"/>
-                  </td>
                   <td class="particular_amount">
                     <?= number_format($payslip['current_daily_wage'] * $payslip['days_rendered'] * $payslip['daily_wage_units'], 2);?>
                   </td>
@@ -79,7 +84,6 @@
                   <td></td>
                   <td>Overtime</td>
                   <td>Daily</td>
-                  <td>-</td>
                   <td>-</td>
                   <td>-</td>
                   <td class="particular_amount"><?= number_format($payslip['overtime_pay'], 2);?></td>
@@ -103,7 +107,6 @@
                         <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 0);" value="<?= $additionals['amount'];?>"/>
                       </td>
                       <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
-                      <td><input type="number" class="form-control particular_unit" name="units[]" value="<?= $additionals['units'];?>" onchange="calculate_particular_amount(this, 0);"/></td>
                       <td class="particular_amount">
                         <?= number_format($additionals['amount'] * $payslip['days_rendered'] * $additionals['units'], 2);?>
                       </td>
@@ -134,9 +137,6 @@
                   </td>
                   <td>
                     <input type="number" class="form-control particular_days_rendered" name="" value="0" onchange="calculate_particular_amount(this, 1);"/>
-                  </td>
-                  <td>
-                    <input type="number" class="form-control particular_unit" name="" value="0" onchange="calculate_particular_amount(this, 1);"/>
                   </td>
                   <td class="particular_amount">
                     0.00

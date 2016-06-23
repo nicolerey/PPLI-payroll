@@ -92,6 +92,27 @@ $(document).ready(function(){
 
 	$('.pformat').priceFormat({prefix:''});
 	
+	$('#approve_button').on('click', function(){
+		var btn = $(this);
+		var msgBox = $('.alert-danger').addClass('hidden');
+
+		$.post($(this).data('action'), {id: $(this).data('pk')})
+		.done(function(response){
+			if(response.result){
+				$('.approval_status').text('Approved');
+				btn.hide();
+
+				return;
+			}
+
+			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
+			$('html, body').animate({scrollTop: 0}, 'slow');
+		})
+		.fail(function(){
+			alert('An internal server error has occured');
+		});
+	});
+
 	$('form').submit(function(e){
 		e.preventDefault();
 		var that = $(this),

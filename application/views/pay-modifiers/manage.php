@@ -35,6 +35,12 @@
             <label class="radio-inline"><input type="radio" name="type" value="d"<?php echo (isset($data['type']))?(($data['type']=='d')?' checked':''):'';?>/> Deductions</label>
           </div>
         </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label"></label>
+          <div class="col-sm-9">
+            <label class="checkbox-inline"><input type="checkbox" name="allow_pm" value="true"<?php echo (isset($data['type']) && $data['allow_pm'])?' checked':'';?>/> Allow payroll manager</label>
+          </div>
+        </div>
         <!-- <div class=> -->
       </div><!-- /.box-body -->
       <div class="box-footer clearfix">

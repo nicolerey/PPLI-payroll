@@ -31,7 +31,6 @@ class Employees extends HR_Controller
 			'mode' => MODE_CREATE, 
 			'data' => [],
 			'departments' => array_column($this->department->all(), 'name', 'id'),
-			'particulars' => array_column($this->particulars->all(), 'name', 'id'),
 			'positions' => array_column($this->position->all(), 'name', 'id'),
 		]);
 	}
@@ -49,7 +48,6 @@ class Employees extends HR_Controller
 			'mode' => MODE_EDIT, 
 			'data' => $employee,
 			'departments' => array_column($this->department->all(), 'name', 'id'),
-			'particulars' => array_column($this->particulars->all(), 'name', 'id'),
 			'positions' => array_column($this->position->all(), 'name', 'id'),
 		]);
 	}
@@ -179,11 +177,6 @@ class Employees extends HR_Controller
 		$this->form_validation->set_rules('date_hired', 'date hired', 'required|callback__validate_date');
 		$this->form_validation->set_rules('department_id', 'department', 'required|callback__validate_department');
 		$this->form_validation->set_rules('position_id', 'position', 'required|callback__validate_position');
-		$this->form_validation->set_rules('daily_rate', 'daily wage', 'required|callback__validate_numeric');
-		$this->form_validation->set_rules('overtime_rate', 'overtime rate', 'required|callback__validate_numeric');
-		$this->form_validation->set_rules('allowed_late_period', 'allowed late  period', 'required|callback__validate_numeric');
-		$this->form_validation->set_rules('late_penalty', 'late penalty', 'required|callback__validate_numeric');
-
 	}
 
 	public function _format_data($mode)
@@ -222,11 +215,7 @@ class Employees extends HR_Controller
 
 		$basic_info += [
 			'birthdate' => date('Y-m-d', strtotime($this->input->post('birthdate'))),
-			'date_hired' => date('Y-m-d', strtotime($this->input->post('date_hired'))),
-			'daily_rate' => str_replace(',', '', $this->input->post('daily_rate')),
-			'overtime_rate' => str_replace(',', '', $this->input->post('overtime_rate')),
-			'allowed_late_period' => str_replace(',', '', $this->input->post('allowed_late_period')),
-			'late_penalty' => str_replace(',', '', $this->input->post('late_penalty'))
+			'date_hired' => date('Y-m-d', strtotime($this->input->post('date_hired')))
 		];
 		if($uid = trim($this->input->post('rfid_uid'))){
 			$basic_info['rfid_uid'] = $uid;

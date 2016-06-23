@@ -10,8 +10,10 @@ class Pay_modifier_model extends CI_Model
 		parent::__construct();
 	}
 
-	public function all($filter_result = FALSE)
+	public function all($filter_result = FALSE, $pm_flag = FALSE)
 	{
+		if($pm_flag)
+			$this->db->where('allow_pm', 1);
 		if($filter_result)
 			$this->db->where_not_in('id', $filter_result);
 

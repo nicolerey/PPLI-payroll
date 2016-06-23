@@ -103,6 +103,13 @@ class Attendance extends HR_Controller
 		$this->generate_page('attendance/view', array('data'=>$data, 'search_employee'=>$search_employee, 'test'=>$test));
 	}
 
+	function dos2unix($s) {
+	    $s = str_replace("\r\n", "\n", $s);
+	    $s = str_replace("\r", "\n", $s);
+	    $s = preg_replace("/\n{2,}/", "\n\n", $s);
+	    return $s;
+	}
+
 	public function upload_attendance(){
 		$config['upload_path']   = './assets/uploads/'; 
 		$config['allowed_types'] = 'txt|csv';
@@ -117,8 +124,15 @@ class Attendance extends HR_Controller
 
 			$this->load->helper('file');
 
-			$string = file_get_contents('./assets/uploads/'.$file_info['file_name']);
-			$row = explode("\n", $string);
+			$string = str_replace('"', '', $this->dos2unix(file_get_contents('./assets/uploads/'.$file_info['file_name'])));
+
+
+			$row = explode(PHP_EOL, $string);
+
+			// echo "<pre>";
+			// var_dump($row);
+			// echo "</pre>";
+			// return;
 
 			$upload_batch_id = $this->employee->get_batch_id();
 			if(!$upload_batch_id)
@@ -127,27 +141,44 @@ class Attendance extends HR_Controller
 			$employee_attendance = [];
 			$employee_id = 0;
 			for($index = 6; $index<count($row); $index++){
-				$col_val = explode('"', $row[$index]);
-				$dif_val = explode(",", $col_val[0]);
 
-				if(isset($col_val[1]) && !$this->validateDate($col_val[1])){
-					$name = explode(",", $col_val[1]);
-					$lastname = $name[0];
-					unset($name[0]);
-					$f_m_name = explode(" ", implode(" ", $name));
-					$firstname = [];
-					$middleinitial = "";
-					foreach ($f_m_name as $value) {
-						if($value!="" && $value!=" "){
-							if(strpos($value, ".")===FALSE)
-								array_push($firstname, $value);
-							else
-								if($value!=".")
-									$middleinitial = chop($value, ".");
-						}
-					}
-					$firstname = implode(" ", $firstname);
-					$middleinitial = chop($middleinitial, " ");
+				// this may contain the name
+				// $col_val = explode('"', $row[$index]);
+
+				// if col val will not contain name then it may contain datetimes
+				$dif_val = explode(",", $row[$index]);
+
+				if(($dif_val[0] && $dif_val[1])&& !$this->validateDate($dif_val[0])){
+				// if($isset($col_val[1]) && !$this->validateDate($col_val[1])){
+
+					// print_r($dif_val);
+
+					// this will hold lastname
+					$lastname = trim($dif_val[0]);
+
+					//this will hold first name and MI
+					$temp = explode(" ", $dif_val[1]);
+					$mi_index = count($temp) - 1;
+					$middleinitial = trim(rtrim($temp[$mi_index], '.'));
+					unset($temp[$mi_index]);
+
+					$firstname = trim(implode(" ", $temp));
+
+					// unset($name[0]);
+					// $f_m_name = explode(" ", implode(" ", $name));
+					// $firstname = [];
+					// $middleinitial = "";
+					// foreach ($f_m_name as $value) {
+					// 	if($value!="" && $value!=" "){
+					// 		if(strpos($value, ".")===FALSE)
+					// 			array_push($firstname, $value);
+					// 		else
+					// 			if($value!=".")
+					// 				$middleinitial = chop($value, ".");
+					// 	}
+					// }
+					// $firstname = implode(" ", $firstname);
+					// $middleinitial = chop($middleinitial, " ");
 
 					$employee_name = [
 						'firstname' => $firstname,
@@ -158,9 +189,13 @@ class Attendance extends HR_Controller
 					$res = $this->employee->get_employee($employee_name);
 
 					$employee_id = $res['id'];
+					// echo $employee_id;
+					// print_r($employee_name);
 				}
 				else if($employee_id && isset($dif_val[0]) && $this->validateDate($dif_val[0])){
+					// echo "lol";
 					$attendance = explode(',', $row[$index]);
+
 					$date = explode(" ", str_replace('"', "", $attendance[0]))[0];
 					unset($attendance[0]);
 
@@ -177,7 +212,7 @@ class Attendance extends HR_Controller
 							$datetime_out = date_format(date_create("{$date} ".str_replace('"', '', $attendance[$key+1])), 'Y-m-d H:i:s');
 
 						if($datetime_in || $datetime_out){
-							array_push($employee_attendance, [
+							$employee_attendance[] = [
 								'employee_id' => intval($employee_id),
 								'datetime_in' => $datetime_in,
 								'datetime_out' => $datetime_out,
@@ -185,13 +220,18 @@ class Attendance extends HR_Controller
 								'created_by' => $this->session->userdata('id'),
 								'last_updated_by' => $this->session->userdata('id'),
 								'last_approved_by' => $this->session->userdata('id')
-							]);
+							];
 						}
 					}
 				}
 			}
 
 			unlink('./assets/uploads/'.$file_info['file_name']);
+
+			// echo "<pre>";
+			// var_dump($employee_attendance);
+			// echo "</pre>";
+			// return;
 
 			if(!empty($employee_attendance)){
 				if(count($employee_attendance)>20){

@@ -25,7 +25,7 @@ class positions extends HR_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('Position_model', 'position');
+		$this->load->model(['Position_model' => 'position', 'Pay_modifier_model' => 'particulars']);
 	}
 
 	public function index()
@@ -39,13 +39,14 @@ class positions extends HR_Controller
 
 	public function create()
 	{
-		$this->import_plugin_script('bootstrap-timepicker/bootstrap-timepicker.min.js');
+		$this->import_plugin_script(['bootstrap-timepicker/bootstrap-timepicker.min.js', 'price-format.js']);
 		$this->import_page_script('manage-positions.js');
 		$this->generate_page('positions/manage', [
 			'title' => 'Create new position',
 			'mode' => MODE_CREATE, 
 			'days' => $this->days,
-			'data' => []
+			'data' => [],
+			'particulars' => array_column($this->particulars->all(), 'name', 'id')
 		]);
 	}
 
@@ -54,13 +55,14 @@ class positions extends HR_Controller
 		if(!$id || !$position = $this->position->get($id)){
 			show_404();
 		}
-		$this->import_plugin_script('bootstrap-timepicker/bootstrap-timepicker.min.js');
+		$this->import_plugin_script(['bootstrap-timepicker/bootstrap-timepicker.min.js', 'price-format.js']);
 		$this->import_page_script('manage-positions.js');
 		$this->generate_page('positions/manage', [
 			'title' => 'Update existing position',
 			'mode' => MODE_EDIT, 
 			'days' => $this->days,
-			'data' => $position
+			'data' => $position,
+			'particulars' => array_column($this->particulars->all(), 'name', 'id')
 		]);
 	}
 
@@ -156,6 +158,13 @@ class positions extends HR_Controller
 		$this->form_validation->set_rules('to_time_1[]', 'ending work time', 'required');
 		$this->form_validation->set_rules('from_time_2[]', 'starting work time', 'required');
 		$this->form_validation->set_rules('to_time_2[]', 'ending work time', 'required');
+
+		if($this->session->userdata('account_type')!=='pm'){
+			$this->form_validation->set_rules('daily_rate', 'daily wage', 'required|callback__validate_numeric');
+			$this->form_validation->set_rules('overtime_rate', 'overtime rate', 'required|callback__validate_numeric');
+			$this->form_validation->set_rules('allowed_late_period', 'allowed late  period', 'required|callback__validate_numeric');
+			$this->form_validation->set_rules('late_penalty', 'late penalty', 'required|callback__validate_numeric');
+		}
 	}
 
 	public function _format_data($mode)
@@ -197,6 +206,28 @@ class positions extends HR_Controller
 			'workday' => json_encode($workday)
 		];
 
+		$particulars = [];
+		if($this->session->userdata('account_type')!=='pm'){
+			$data += [
+				'daily_rate' => str_replace(',', '', $input['daily_rate']),
+				'overtime_rate' => str_replace(',', '', $input['overtime_rate']),
+				'allowed_late_period' => str_replace(',', '', $input['allowed_late_period']),
+				'late_penalty' => str_replace(',', '', $input['late_penalty'])
+			];
+
+			if(is_array($temp = $this->input->post('particulars'))){
+				foreach($temp AS $row){
+					if(isset($row['particulars_id']) && $row['particulars_id']){
+						$particulars[] = [
+							'particulars_id' => $row['particulars_id'],
+							'amount' => str_replace(',', '', $row['amount'])
+						];
+					}
+				}
+			}
+		}
+		$data['particulars'] = $particulars;
+
 		return $data;
 	}
 
@@ -210,5 +241,11 @@ class positions extends HR_Controller
 	{
 		$this->form_validation->set_message('_validate_workday', 'Please select %s.');
 		return in_array($val, array_keys($this->days));
+	}
+
+	public function _validate_numeric($val)
+	{
+		$this->form_validation->set_message('_validate_numeric', 'The %s is invalid.');
+		return is_numeric(str_replace(',', '', $val));
 	}
 }

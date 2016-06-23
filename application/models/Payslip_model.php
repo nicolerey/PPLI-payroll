@@ -2,11 +2,11 @@
 
 class Payslip_model extends CI_Model
 {
+	protected $table = 'payroll';
+
 	public function calculate($employee_id, $from, $to, $bypass_check = FALSE)
 	{
-		if((($id = $this->check($employee_id, $from, $to)) !== TRUE) && !$bypass_check){
-			return $id;
-		}
+		$this->check($employee_id, $from, $to);
 
 		$this->load->model(['Employee_model' => 'employee', 'Position_model' => 'position', 'Loan_model' => 'loan']);
 		$employee_data = $this->employee->get($employee_id);
@@ -26,10 +26,6 @@ class Payslip_model extends CI_Model
 		$actual_hrs_rendered = 0;
 
 		$pos_workday = json_decode($position['workday'], true);
-
-		/*echo "<pre>";
-		print_r($pos_workday);
-		echo "</pre>";*/
 
 		$emp_att = [];
 		if(!empty($pos_workday)){
@@ -153,10 +149,6 @@ class Payslip_model extends CI_Model
 								]);
 							}
 
-							/*echo "<pre>";
-							print_r($emp_att);
-							echo "</pre><br><br>";*/
-
 							break;
 						}
 					}
@@ -208,7 +200,7 @@ class Payslip_model extends CI_Model
 		$data['regular_overtime_pay'] = 0;
 		if(!empty($emp_att)){
 			foreach ($emp_att as $key => $value) {
-				if($value['total_late']<=$employee_data['allowed_late_period']){
+				if($value['total_late']<=$position['allowed_late_period']){
 					$total_late_minutes += $value['total_late'];
 					$total_regular_hrs += $pos_workday[$value['workday_index']]['total_working_hours'];
 					$overtime_hours = 0;
@@ -217,7 +209,7 @@ class Payslip_model extends CI_Model
 						$total_overtime_hrs += floor($overtime_hours);
 					}
 
-					$overtime_hrly = $employee_data['daily_rate'] * ($employee_data['overtime_rate'] / 100);
+					$overtime_hrly = $position['daily_rate'] * ($position['overtime_rate'] / 100);
 					$data['regular_overtime_pay'] += round($overtime_hrly * floor($overtime_hours));
 
 					if($value['total_working_hours']>=$pos_workday[$value['workday_index']]['total_working_hours'])
@@ -228,15 +220,15 @@ class Payslip_model extends CI_Model
 			}
 		}
 
-		$data['daily_wage'] = $employee_data['daily_rate'];
-		$data['late_penalty'] = $employee_data['late_penalty'];
+		$data['daily_wage'] = $position['daily_rate'];
+		$data['late_penalty'] = $position['late_penalty'];
 
 		$data['total_regular_days'] = round($total_regular_days, 2);
 		$data['total_overtime_hrs'] = round($total_overtime_hrs, 2);
 		$data['total_late_minutes'] = round($total_late_minutes, 2);
-		$data['total_late_deduction'] = $data['total_late_minutes'] * $employee_data['late_penalty'];
+		$data['total_late_deduction'] = $data['total_late_minutes'] * $position['late_penalty'];
 
-		$data['regular_pay'] = round($data['total_regular_days'] * $employee_data['daily_rate'], 2);
+		$data['regular_pay'] = round($data['total_regular_days'] * $position['daily_rate'], 2);
 
 		$data['total_earnings'] = $data['regular_pay'] + $data['regular_overtime_pay'];
 
@@ -244,10 +236,6 @@ class Payslip_model extends CI_Model
 		$data['total_deductions'] += ($data['total_regular_days'] * $data['total_daily_deductions']);
 
 		$data['net_pay'] = $data['total_earnings'] + $data['total_additionals'] - $data['total_deductions'] - $data['total_late_deduction'];
-
-		/*echo "<pre>";
-		print_r($data);
-		echo "</pre><br><br>";*/
 		
 		return $data;
 	}
@@ -298,9 +286,14 @@ class Payslip_model extends CI_Model
 		return $value_index;
 	}
 
-	public function create($employee_number, $month, $adjustment = 0)
+	public function get_last_batch_id()
 	{
-		$range = phase($month);
+		$this->db->select_max('batch_id');
+		return $this->db->get($this->table)->row_array();
+	}
+
+	public function create($employee_number, $range, $batch_id, $adjustment = 0)
+	{
 		$payslip = $this->calculate($employee_number, $range[0], $range[1]);
 		if(is_numeric($payslip) || empty($payslip)){
 			return;
@@ -317,7 +310,15 @@ class Payslip_model extends CI_Model
 			'current_late_penalty' => $payslip['late_penalty'],
 			'overtime_pay' => $payslip['regular_overtime_pay'],
 			'created_by' => user_id(),
+			'batch_id' => $batch_id
 		];
+		if($this->session->userdata('account_type')=='ad'){
+			$data['approval_status'] = TRUE;
+			$data['approved_by'] = $this->session->userdata('id');
+		}
+		else
+			$data['approved_by'] = NULL;
+
 		$this->db->trans_start();
 
 		$this->db->insert('payroll', $data);
@@ -358,13 +359,18 @@ class Payslip_model extends CI_Model
 			'start_date' => $from,
 			'end_date' => $to,
 		]);
+
 		$result = $this->db->get()->row_array();
-		return $result ? $result['id'] : TRUE;
+		if($result){
+			$this->db->where('id', $result['id']);
+			$this->db->delete('payroll');
+		}
+		return;
 	}
 
 	public function all($employee_id = FALSE)
 	{
-		$this->db->select('p.start_date, p.end_date, p.id, e.firstname, e.middleinitial, e.lastname')->from('payroll AS p')->join('employees AS e', 'p.employee_id = e.id');
+		$this->db->select('p.start_date, p.batch_id, p.approval_status, p.end_date, p.id, e.firstname, e.middleinitial, e.lastname')->from('payroll AS p')->join('employees AS e', 'p.employee_id = e.id');
 		if($employee_id){
 			$this->db->where('employee_id', $employee_id);
 		}
@@ -377,10 +383,10 @@ class Payslip_model extends CI_Model
 		return $this->db->update('payroll', ['wage_adjustment' => $amount], ['id' => $id]);
 	}
 
-	public function get_by_employee($id, $employee_id)
+	public function get_by_employee($id)
 	{
 		$this->load->model(['Loan_model' => 'loan']);
-		$data = $this->db->get_where('payroll', ['id' => $id, 'employee_id' => $employee_id])->row_array();
+		$data = $this->db->get_where('payroll', ['id' => $id])->row_array();
 		if($data){
 			$data['particulars'] = ['deductions' => [], 'additionals' => []];
 			$this->db->select('p.id, p.name, p.type, p.particular_type, pp.amount, pp.units');
@@ -395,7 +401,7 @@ class Payslip_model extends CI_Model
 					$data['particulars']['deductions'][] = $p;
 				}
 			}
-			$loan = $this->loan->all($employee_id, NULL, NULL, NULL, $data['start_date'], $data['end_date']);
+			$loan = $this->loan->all($data['employee_id'], NULL, NULL, NULL, $data['start_date'], $data['end_date']);
 			if($loan){
 				foreach ($loan as $loan_key => $loan_value) {
 					foreach ($loan_value['payment_terms'] as $payment_key => $payment_value) {
@@ -408,17 +414,28 @@ class Payslip_model extends CI_Model
 		
 	}
 
-	public function insert_salary_particular($salary_particular, $payroll_particular)
+	public function insert_salary_particular(/*$salary_particular, */$payroll_particular)
 	{
-		$salary_flag = 0;
+		/*$salary_flag = 0;
 		if($this->db->insert_batch('salary_particulars', $salary_particular))
-			$salary_flag = 1;
+			$salary_flag = 1;*/
 
 		$pp_flag = 0;
 		if($this->db->insert_batch('payroll_particulars', $payroll_particular))
 			$pp_flag = 1;
 
-		return ($salary_flag && $pp_flag)?TRUE:FALSE;
+		return (/*$salary_flag && */$pp_flag)?TRUE:FALSE;
+	}
+
+	public function update_payroll_batch_normal($data, $type)
+	{
+		if($type=="BATCH")
+			return $this->db->update_batch('payroll', $data, 'id');
+		else if($type=="NORMAL"){
+			$this->db->where('id', $data['id']);
+			unset($data['id']);
+			return $this->db->update('payroll', $data);
+		}
 	}
 
 	public function update_payroll($payroll_id, $payroll_update, $payroll_particulars_update)
@@ -428,8 +445,12 @@ class Payslip_model extends CI_Model
 		if($this->db->update('payroll', $payroll_update))
 			$payrol_flag = 1;
 
-		$this->db->where('payroll_id', $payroll_id);
-		$this->db->update_batch('payroll_particulars', $payroll_particulars_update, 'particulars_id');
+		if($payroll_particulars_update){
+			$this->db->where('payroll_id', $payroll_id);
+			$this->db->update_batch('payroll_particulars', $payroll_particulars_update, 'particulars_id');
+		}
+
+		
 
 		return ($payrol_flag)?TRUE:FALSE;
 	}

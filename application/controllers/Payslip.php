@@ -8,50 +8,42 @@ class Payslip extends HR_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model(['Payslip_model' => 'payslip', 'Employee_model' => 'employee']);
+		$this->load->model(['Payslip_model' => 'payslip', 'Employee_model' => 'employee', 'Department_model' => 'department']);
 	}
 
 	public function index()
 	{
-		$employees = $this->employee->all();
-		foreach($employees AS &$emp){
-			$emp['fullname'] = "{$emp['lastname']}, {$emp['firstname']} {$emp['middleinitial']} [{$emp['id']}]";
-		}
+		$departments = $this->department->all();
 		$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
 		$this->import_page_script(['manage-payslip.js']);
 		$this->generate_page('payslip/generate', [
 			'title' => 'Generate payslip',
-			'employees' => array_column($employees, 'fullname', 'id')
+			'departments' => array_column($departments, 'name', 'id')
 		]);
 	}
 
 	public function generate()
 	{
-		$input = elements(['month', 'employee_number'], $this->input->get());
+		$input = $this->input->post();
 
 		$date = [];
-		$range = phase($input['month']);
+		$range = [
+			date_format(date_create($input['from_date']), 'Y-m-d'),
+			date_format(date_create($input['to_date']), 'Y-m-d')
+		];
 
 		$created = 0;
-		if($input['employee_number'] === 'all'){
-			$all = array_column($this->employee->all(), 'id');
+		if($this->department->exists($input['department_id'])){
+			$last_batch_id = $this->payslip->get_last_batch_id();
+			$all = array_column($this->department->get_employees($input['department_id']), 'id');
 			foreach($all AS $row){
-				$status = $this->payslip->create($row, $input['month'], 0);
+				$status = $this->payslip->create($row, $range, $last_batch_id['batch_id']+1, 0);
 				if($status === TRUE){
 					$created++;
 				}
 			}
 			$this->session->set_flashdata('mass_payroll_status_complete', $created);
 			redirect('payslip');
-		}
-
-		if(!$this->employee->exists($input['employee_number'])){
-			redirect('payslip');
-		}
-
-		$data = $this->payslip->create($input['employee_number'], $input['month'], 0);
-		if($data){
-			$created = 1;
 		}
 
 		$this->session->set_flashdata('mass_payroll_status_complete', $created);
@@ -76,19 +68,18 @@ class Payslip extends HR_Controller
 		if($input){
 			$employee_id = $input['employee_id'];
 			$payroll_id = $input['id'];
-			$salary_particular = [];
+			//$salary_particular = [];
 			$payroll_particular = [];
 			if(isset($input['additional_name'])){
 				foreach ($input['additional_name'] as $key => $value) {
-					$salary_particular[] = [
+					/*$salary_particular[] = [
 						'employee_id' => $employee_id,
 						'particulars_id' => $input['additional_name'][$key],
 						'amount' => floatval(str_replace(',', '', $input['additional_particular_rate'][$key]))
-					];
+					];*/
 					$payroll_particular[] = [
 						'payroll_id' => $payroll_id,
 						'particulars_id' => $input['additional_name'][$key],
-						'units' => $input['particular_units'][$key],
 						'amount' => floatval(str_replace(',', '', $input['additional_particular_rate'][$key]))
 					];
 				}
@@ -96,41 +87,39 @@ class Payslip extends HR_Controller
 
 			if(isset($input['deduction_name'])){
 				foreach ($input['deduction_name'] as $key => $value) {
-					$salary_particular[] = [
+					/*$salary_particular[] = [
 						'employee_id' => $employee_id,
 						'particulars_id' => $input['deduction_name'][$key],
 						'amount' => floatval(str_replace(',', '', $input['deduction_particular_rate'][$key]))
-					];
+					];*/
 					$payroll_particular[] = [
 						'payroll_id' => $payroll_id,
 						'particulars_id' => $input['deduction_name'][$key],
-						'units' => 0,
 						'amount' => floatval(str_replace(',', '', $input['deduction_particular_rate'][$key]))
 					];
 				}
 			}
 
 			$payroll_update = [
-				'current_daily_wage' => $input['basic_rate'],
-				'daily_wage_units' => floatval(str_replace(',', '', $input['basic_rate_units'][0]))
+				'current_daily_wage' => floatval(str_replace(',', '', $input['basic_rate']))
 			];
 
 			$payroll_particulars_update = [];
-			foreach ($input['particular_id'] as $key => $value) {
-				$unit = 0;
-				if(isset($input['units'][$key]))
-					$unit = $input['units'][$key];
+			if(isset($input['particular_id'])){
+				foreach ($input['particular_id'] as $key => $value) {
+					$unit = 0;
 
-				$payroll_particulars_update[] = [
-					'particulars_id' => $value,
-					'units' => $unit,
-					'amount' => floatval(str_replace(',', '', $input['particular_rate'][$key]))
-				];
+					$payroll_particulars_update[] = [
+						'particulars_id' => $value,
+						'amount' => floatval(str_replace(',', '', $input['particular_rate'][$key]))
+					];
+				}
 			}
+			
 
 			$insert_flag = 0;
-			if(!empty($salary_particular) && !empty($payroll_particular)){
-				if($this->payslip->insert_salary_particular($salary_particular, $payroll_particular))
+			if(/*!empty($salary_particular) && */!empty($payroll_particular)){
+				if($this->payslip->insert_salary_particular(/*$salary_particular, */$payroll_particular))
 					$insert_flag = 1;
 			}
 			else

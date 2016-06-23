@@ -1,6 +1,7 @@
 (function($){
 	$(document).ready(function(){
-		$('.datepicker').datepicker();
-		$();
+		$('.datepicker').datepicker({
+			orientation: 'bottom'
+		});
 	});
 })(jQuery)

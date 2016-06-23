@@ -24,16 +24,7 @@ class Employee_model extends CI_Model
 
         // insert position yaz_record(id, pos, type)
         $position = ['employee_id' => $id, 'position_id' => $data['position_id'], 'from' => date('Y-m-d')];
-        $this->db->insert('employee_positions', $position);
-
-        if(!empty($data['particulars'])){
-            foreach($data['particulars'] AS &$row){
-                $row['employee_id'] = $id;
-            }
-
-            $this->db->insert_batch('salary_particulars', $data['particulars']);
-        }
-        
+        $this->db->insert('employee_positions', $position);        
 
         $this->db->trans_complete();
 
@@ -86,14 +77,6 @@ class Employee_model extends CI_Model
             $this->db->insert('employee_positions', $position);
         }
 
-        $this->db->delete('salary_particulars', ['employee_id' => $id]);
-        if(!empty($data['particulars'])){
-            foreach($data['particulars'] AS &$row){
-                $row['employee_id'] = $id;
-            }
-            $this->db->insert_batch('salary_particulars', $data['particulars']);
-        }
-
         $this->db->trans_complete();
 
         return $this->db->trans_status();
@@ -101,7 +84,8 @@ class Employee_model extends CI_Model
 
     public function get_employee($condition)
     {
-        return $this->db->get_where($this->table, $condition)->row_array();
+        $ok = $this->db->get_where($this->table, $condition)->row_array();
+        return $ok;
     }
 
     public function get($id = FALSE, $id_number = FALSE)
@@ -131,7 +115,7 @@ class Employee_model extends CI_Model
         $result['particulars'] = $this->db->select('sp.amount, pm.type, pm.name, pm.particular_type, pm.id, sp.particulars_id')
             ->from('salary_particulars AS sp')
             ->join('pay_modifiers AS pm', 'pm.id = sp.particulars_id')
-            ->where( ['employee_id' => $id])
+            ->where( ['position_id' => $result['position_id']])
             ->get()
             ->result_array();
         
@@ -398,7 +382,7 @@ class Employee_model extends CI_Model
     public function get_employee_pay_particulars($id)
     {
         $this->db->select('particulars_id');
-        return $this->db->get_where('salary_particulars', ['employee_id'=>$id])->result_array();
+        return $this->db->get_where('salary_particulars', ['position_id'=>$id])->result_array();
     }
 
     public function get_batch_id()

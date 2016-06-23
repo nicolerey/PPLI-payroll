@@ -109,6 +109,14 @@ class Pay_modifiers extends HR_Controller
 	public function _format_data($mode)
 	{
 		$data = elements(['type', 'name', 'particular_type'], $this->input->post());
+		if($this->input->post('allow_pm'))
+			$data += [
+				'allow_pm' => TRUE
+			];
+		else
+			$data += [
+				'allow_pm' => FALSE
+			];
 		return $data;
 	}
 
