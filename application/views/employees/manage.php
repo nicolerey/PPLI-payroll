@@ -44,7 +44,7 @@
             <div class="password_fields"<?= (isset($data['account_type']) && $data['account_type']!="ad" && $data['account_type']!="pm")?"style='display: none;'":"";?>>
               <?php if($mode!==MODE_CREATE):?>
                 <div class="form-group">              
-                  <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> User password</label>
+                  <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Current password</label>
                   <div class="col-sm-3">
                     <?= form_password(['name'=>'old_password', 'class'=>'form-control']);?>
                   </div>
@@ -56,7 +56,7 @@
                   <?php if($mode===MODE_CREATE):?>
                     <span class="fa fa-asterisk text-danger"></span>
                   <?php endif;?>
-                   Enter account password</label>
+                   New password</label>
                 <div class="col-sm-3">
                   <?= form_password(['name'=>'password', 'class'=>'form-control']);?>
                 </div>
@@ -64,7 +64,7 @@
                   <?php if($mode===MODE_CREATE):?>
                     <span class="fa fa-asterisk text-danger"></span>
                   <?php endif;?>
-                   Confirm password</label>
+                   Confirm new password</label>
                 <div class="col-sm-3">
                   <?= form_password(['name'=>'confirm_password', 'class'=>'form-control']);?>
                 </div>

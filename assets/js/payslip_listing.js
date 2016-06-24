@@ -16,5 +16,18 @@
 			});
 		});
 
+		$('#print_button').on('click', function(){
+			var wndw = window.open();
+			$(this).data('url')+"/"+$('#batch_id').val();
+
+			$.post($(this).data('url')+"/"+$('#batch_id').val())
+			.done(function(response){
+				wndw.document.write(response);
+				wndw.document.close();
+				wndw.focus();
+				wndw.print();
+				wndw.close();
+			});
+		})
 	})
 })(jQuery)

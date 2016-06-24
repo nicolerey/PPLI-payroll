@@ -13,7 +13,7 @@ class My_payslip extends HR_Controller
 
 	public function index()
 	{
-		$this->import_page_script('payslip_listing.js');
+		$this->import_page_script(['payslip_listing.js', 'jquery.printPage.js']);
 		$this->generate_page('my-payslip/listing', [
 			'items' => $this->payslip->all()
 		]);
@@ -51,7 +51,7 @@ class My_payslip extends HR_Controller
 		$this->output->set_content_type('json');
 		if($this->session->userdata('account_type')=='ad'){
 			$input = $this->input->post();
-			if(isset($input['checkbox']) && empty($input['checkbox'])){
+			if(empty($input)){
 				$this->output->set_output(json_encode([
 					'result' => FALSE,
 					'messages' => ['No payslip selected.']
@@ -71,7 +71,7 @@ class My_payslip extends HR_Controller
 				}
 				$result = $this->payslip->update_payroll_batch_normal($data, "BATCH");
 			}
-			else{
+			else if(isset($input['id'])){
 				$data = [
 					'id' => $input['id'],
 					'approval_status' => TRUE,
@@ -100,5 +100,14 @@ class My_payslip extends HR_Controller
 			'messages' => ['No permission to approve.']
 		]));
 		return;
+	}
+
+	public function print_payslip($batch_id = FALSE)
+	{
+		$payslips = [];
+		if($batch_id)
+			$payslips = $this->payslip->get_by_batch_to_print($batch_id);
+
+		$this->load->view('print_docu', ['payslips' => $payslips]);
 	}
 }

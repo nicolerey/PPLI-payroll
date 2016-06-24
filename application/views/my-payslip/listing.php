@@ -5,6 +5,10 @@
     <?php if($this->session->userdata('account_type')=='ad'):?>
       <button type="button" style="margin-right: 5px;" class="btn btn-flat btn-success pull-right btn-sm" id="approve_button"><i class="fa fa-check"></i> Approve selected</button>
     <?php endif;?>
+    <button type="button" style="margin-right: 5px;" class="btn btn-flat btn-primary pull-right btn-sm" id="print_button" data-url="<?= base_url('my_payslip/print_payslip/');?>"><i class="fa fa-print"></i> Print payslip</button>
+    <div class="col-sm-2 pull-right">
+      <input type="number" class="form-control pull-right" id="batch_id"/>
+    </div>
   </h1>
 </section>
 <section class="content">

@@ -368,6 +368,59 @@ class Payslip_model extends CI_Model
 		return;
 	}
 
+	public function get_by_batch_to_print($batch_id)
+	{
+		$this->db->select("p.*, e.id AS emp_id, CONCAT(e.firstname, ' ', e.middleinitial, '. ', e.lastname) AS employee_name", FALSE);
+		$this->db->where(['batch_id' => $batch_id]);
+		$this->db->join('payroll as p', 'e.id = p.employee_id');
+		$payroll_result = $this->db->get('employees as e')->result_array();
+
+		$data = [];
+		foreach ($payroll_result as $key => $value) {
+			$this->db->select('pm.name, pm.type, pp.amount');
+			$this->db->join('pay_modifiers as pm', 'pm.id = pp.particulars_id');
+			$particulars = $this->db->get_where('payroll_particulars as pp', ['pp.payroll_id' => $value['id']])->result_array();
+
+			$total_particulars = 0;
+			$additionals = [];
+			$deductions = [];
+			foreach ($particulars as $particulars_key => $particulars_value) {
+				if($particulars_value['type']=='a'){
+					$total_particulars += $particulars_value['amount'];
+					$additionals[] = $particulars_value;
+				}
+				else{
+					$total_particulars -= $particulars_value['amount'];
+					$deductions[] = $particulars_value;
+				}
+			}
+
+			$this->db->select('pt.payment_amount, pt.payment_date');
+			$this->db->join('loans as l', 'l.id = pt.loan_id');
+			$this->db->where(['pt.payment_date >=' => $value['start_date'], 'pt.payment_date <=' => $value['end_date'], 'l.employee_id' => $value['emp_id']]);
+			$loan_payments = $this->db->get('payment_terms as pt')->result_array();
+			foreach ($loan_payments as $loan_payments_key => $loan_payments_value) {
+				$total_particulars -= $loan_payments_value['payment_amount'];
+			}
+
+			$net_pay = ($value['current_daily_wage'] * $value['days_rendered']) + $value['overtime_pay'] - ($value['current_late_penalty'] * $value['late_minutes']) + $total_particulars;
+
+			$data[] = [
+				'employee_name' => $value['employee_name'],
+				'regular_wage' => $value['current_daily_wage'] * $value['days_rendered'],
+				'overtime_pay' => $value['overtime_pay'],
+				'late_pay' => $value['current_late_penalty'] * $value['late_minutes'],
+				'particulars' => $particulars,
+				'loan_payments' => $loan_payments,
+				'additionals' => $additionals,
+				'deductions' => $deductions,
+				'net_pay' => $net_pay
+			];
+		}
+
+		return $data;
+	}
+
 	public function all($employee_id = FALSE)
 	{
 		$this->db->select('p.start_date, p.batch_id, p.approval_status, p.end_date, p.id, e.firstname, e.middleinitial, e.lastname')->from('payroll AS p')->join('employees AS e', 'p.employee_id = e.id');
