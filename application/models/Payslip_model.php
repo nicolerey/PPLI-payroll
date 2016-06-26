@@ -405,7 +405,10 @@ class Payslip_model extends CI_Model
 
 			$net_pay = ($value['current_daily_wage'] * $value['days_rendered']) + $value['overtime_pay'] - ($value['current_late_penalty'] * $value['late_minutes']) + $total_particulars;
 
+			$start_date = date_format(date_create($value['start_date']), 'M d, Y');
+			$end_date = date_format(date_create($value['end_date']), 'M d, Y');
 			$data[] = [
+				'date' => "{$start_date} - {$end_date}",
 				'employee_name' => $value['employee_name'],
 				'regular_wage' => $value['current_daily_wage'] * $value['days_rendered'],
 				'overtime_pay' => $value['overtime_pay'],

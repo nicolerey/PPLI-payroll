@@ -12,7 +12,11 @@ foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
 				foreach($chunk_by_two_value as $employee_key=>$employee_value):?>
 					<div class="col-xs-6 form-horizontal" style="height: 100%; border: 1px solid;">
 						<div class="form-group">
-							<label class="col-xs-3 control-label">Employee Name:</label>
+							<label class="col-xs-1">Date:</label>
+							<label class="col-xs-8"><?= $employee_value['date'];?></label>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-3">Employee Name:</label>
 							<label class="col-xs-8"><u><?= $employee_value['employee_name'];?></u></label>
 						</div>
 						<div class="form-group">

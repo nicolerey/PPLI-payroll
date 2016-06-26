@@ -23,10 +23,10 @@
 			$.post($(this).data('url')+"/"+$('#batch_id').val())
 			.done(function(response){
 				wndw.document.write(response);
-				wndw.document.close();
+				/*wndw.document.close();
 				wndw.focus();
 				wndw.print();
-				wndw.close();
+				wndw.close();*/
 			});
 		})
 	})
