@@ -38,7 +38,9 @@
                     <?= "{$reports['created_by']['firstname']} {$reports['created_by']['middleinitial']}. {$reports['created_by']['lastname']}";?>
                   </td>
                   <td>
-                    <?= ($reports['status'])?"Resolved":"Unresolved";?>
+                    <span class="label label-<?= ($reports['status'])?'success':'warning';?>">
+                      <?= ($reports['status'])?'Resolved':'Unresolved';?>
+                    </span>
                   </td>
                   <td>
                     <?php if(!$reports['status']):?>

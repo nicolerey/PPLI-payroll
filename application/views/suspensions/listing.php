@@ -41,7 +41,9 @@
                     <?= "{$suspension['created_by']['firstname']} {$suspension['created_by']['middleinitial']}. {$suspension['created_by']['lastname']}";?>
                   </td>
                   <td>
-                    <?= ($suspension['status'])?"Approved":"Pending";?>
+                    <span class="label label-<?= ($suspension['status'])?'success':'warning';?>">
+                      <?= ($suspension['status'])?'Approved':'Pending';?>
+                    </span>
                   </td>
                   <td>
                     <?php if(!$suspension['status']):?>

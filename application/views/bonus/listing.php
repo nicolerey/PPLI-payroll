@@ -44,7 +44,9 @@
                     <?= "{$bonus['created_by']['lastname']}, {$bonus['created_by']['firstname']} {$bonus['created_by']['middleinitial']}.";?>
                   </td>
                   <td>
-                    <?= ($bonus['status'])?'Approved':'Pending';?>
+                    <span class="label label-<?= ($bonus['status'])?'success':'warning';?>">
+                      <?= ($bonus['status'])?'Approved':'Pending';?>
+                    </span>
                   </td>
                   <td>
                     <?php if(!$bonus['status']):?>
