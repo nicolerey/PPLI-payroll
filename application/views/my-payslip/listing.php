@@ -41,7 +41,11 @@
                 <td><?= "{$row['firstname']} {$row['middleinitial']} {$row['lastname']}";?></td>
                 <td><?= format_date($row['start_date'], 'd-M-Y')?></td>
                 <td><?= format_date($row['end_date'], 'd-M-Y')?></td>
-                <td><?= ($row['approval_status'])?'Approved':'Pending';?></td>
+                <td>
+                  <span class="label label-<?= ($row['approval_status'])?'success':'warning';?>">
+                    <?= ($row['approval_status'])?'Approved':'Pending';?>
+                  </span>
+                </td>
         			</tr>
         		<?php endforeach;?>
         	</tbody>
