@@ -110,6 +110,16 @@ class Employee_suspensions extends HR_Controller
 		}
 
 		$input = $this->input->post();
+
+		$stat = $this->suspensions->get(['id' => $input['id']], 'status');
+		if($stat['status'] && $this->session->userdata('account_type')=='pm'){
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => ['Account is not authorized to edit.']
+			]));
+			return;
+		}
+
 		$input['start_date'] = date_format(date_create($input['start_date']), 'Y-m-d');
 		$input['end_date'] = date_format(date_create($input['end_date']), 'Y-m-d');
 		$input['resolved_by'] = $this->session->userdata('id');

@@ -21,6 +21,9 @@
             <?php if(isset($image_error)):?>
               <li><?= $image_error;?></li>
             <?php endif;?>
+            <?php if(isset($edit_error)):?>
+              <li>Account is not authorized to edit.</li>
+            <?php endif;?>
           </ul>
         </div>
         <?php if(isset($data) && $this->session->userdata('account_type')=='ad' && !$data['status']):?>

@@ -115,6 +115,26 @@ class Employee_reports extends HR_Controller
 		$this->load->library('upload', $config);
 
 		$input = $this->input->post();
+
+		$stat = $this->reports->get(['id' => $input['id']], 'status');
+		if($stat['status'] && $this->session->userdata('account_type')=='pm'){
+			$employees = $this->employee->all();
+			$emp = [];
+			foreach ($employees as $key => $value) {
+				$emp[$value['id']] = "{$value['lastname']}, {$value['firstname']} {$value['middleinitial']}.";
+			}
+
+			$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
+			$this->import_page_script('create-report.js');
+	        $this->generate_page('reports/create', [
+	        	'title' => 'Edit report',
+	        	'action' => "update",
+	        	'data' => $input,
+	        	'employees' => $emp,
+	        	'edit_error' => TRUE
+	        ]);
+		}
+
 		$input['date'] = date_format(date_create($input['date']), 'Y-m-d');
 		$input['last_updated_by'] = $this->session->userdata('id');
 

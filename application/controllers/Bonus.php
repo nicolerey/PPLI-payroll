@@ -161,6 +161,16 @@ class Bonus extends HR_Controller
 		}
 
 		$input = $this->input->post();
+
+		$stat = $this->bonus->get(['id' => $input['id']], 'status');
+		if($stat['status'] && $this->session->userdata('account_type')=='pm'){
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => ['Account not authorized to edit.']
+			]));
+			return;
+		}
+
 		$input['date'] = date_format(date_create($input['date']), 'Y-m-d');
 		$input['last_updated_by'] = $this->session->userdata('id');
 		$input['condition'] = ['id' => $input['id']];
