@@ -73,7 +73,8 @@ class Employee_reports extends HR_Controller
 		$input['date'] = date_format(date_create($input['date']), 'Y-m-d');
 		$input['created_by'] = $this->session->userdata('id');
 		$input['last_updated_by'] = $this->session->userdata('id');
-		$input['resolved_by'] = NULL;
+		$input['resolved_by'] = $this->session->userdata('id');
+		unset($input['submit']);
 
 		if($_FILES['image']['name']){
 			if (!$this->upload->do_upload('image')){
@@ -87,7 +88,7 @@ class Employee_reports extends HR_Controller
 				$this->import_page_script('create-report.js');
 		        $this->generate_page('reports/create', [
 		        	'action' => "store",
-		        	'data' => $input,
+		        	'data' => $$this->reports->get(['id' => $input['id']]),
 		        	'employees' => $emp,
 		        	'image_error' => $this->upload->display_errors()
 		        ]);
@@ -129,7 +130,7 @@ class Employee_reports extends HR_Controller
 	        $this->generate_page('reports/create', [
 	        	'title' => 'Edit report',
 	        	'action' => "update",
-	        	'data' => $input,
+	        	'data' => $$this->reports->get(['id' => $input['id']]),
 	        	'employees' => $emp,
 	        	'edit_error' => TRUE
 	        ]);
@@ -142,6 +143,7 @@ class Employee_reports extends HR_Controller
 			$input['condition'] = [
 				'id' => $input['id']
 			];
+			$id = $input['id'];
 			unset($input['id']);
 			unset($input['submit']);
 
@@ -158,7 +160,7 @@ class Employee_reports extends HR_Controller
 			        $this->generate_page('reports/create', [
 			        	'title' => 'Edit report',
 			        	'action' => "update",
-			        	'data' => $input,
+			        	'data' => $this->reports->get(['id' => $id]),
 			        	'employees' => $emp,
 			        	'image_error' => $this->upload->display_errors()
 			        ]);
@@ -195,7 +197,7 @@ class Employee_reports extends HR_Controller
 		        $this->generate_page('reports/create', [
 		        	'title' => 'Edit report',
 		        	'action' => "update",
-		        	'data' => $input,
+		        	'data' => $this->reports->get(['id' => $input['id']]),
 		        	'employees' => $emp
 		        ]);
 		    }
