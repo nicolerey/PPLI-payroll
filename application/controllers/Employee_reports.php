@@ -184,7 +184,6 @@ class Employee_reports extends HR_Controller
 			$report = $this->reports->get(['id' => $input['id']]);
 			if(!$report['status'] || ($report['status'] && $this->session->userdata('account_type')=='ad')){
 				$this->reports->update(['image' => NULL, 'condition' => ['id' => $input['id']]]);
-				unlink('./assets/img/reports/'.$report['image']);
 
 				$employees = $this->employee->all();
 				$emp = [];
