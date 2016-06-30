@@ -51,24 +51,26 @@
                 </div>
               <?php endif;?>
 
-              <div class="form-group password_field">              
-                <label class="col-sm-2 control-label">
-                  <?php if($mode===MODE_CREATE):?>
-                    <span class="fa fa-asterisk text-danger"></span>
-                  <?php endif;?>
-                   New password</label>
-                <div class="col-sm-3">
-                  <?= form_password(['name'=>'password', 'class'=>'form-control']);?>
+              <?php if($mode!==MODE_CREATE):?>
+                <div class="form-group password_field">              
+                  <label class="col-sm-2 control-label">
+                    <?php if($mode===MODE_CREATE):?>
+                      <span class="fa fa-asterisk text-danger"></span>
+                    <?php endif;?>
+                     New password</label>
+                  <div class="col-sm-3">
+                    <?= form_password(['name'=>'password', 'class'=>'form-control']);?>
+                  </div>
+                  <label class="col-sm-2 control-label">
+                    <?php if($mode===MODE_CREATE):?>
+                      <span class="fa fa-asterisk text-danger"></span>
+                    <?php endif;?>
+                     Confirm new password</label>
+                  <div class="col-sm-3">
+                    <?= form_password(['name'=>'confirm_password', 'class'=>'form-control']);?>
+                  </div>
                 </div>
-                <label class="col-sm-2 control-label">
-                  <?php if($mode===MODE_CREATE):?>
-                    <span class="fa fa-asterisk text-danger"></span>
-                  <?php endif;?>
-                   Confirm new password</label>
-                <div class="col-sm-3">
-                  <?= form_password(['name'=>'confirm_password', 'class'=>'form-control']);?>
-                </div>
-              </div>
+              <?php endif;?>
             </div>
             
             <div class="form-group">

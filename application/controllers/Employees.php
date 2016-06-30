@@ -143,11 +143,7 @@ class Employees extends HR_Controller
 	public function _perform_validation($mode)
 	{
 		if($this->input->post('account_type')=="ad" || $this->input->post('account_type')=="pm"){
-			if($mode === MODE_CREATE){
-				$this->form_validation->set_rules('password', 'password', 'trim|required|matches[confirm_password]');
-				$this->form_validation->set_rules('confirm_password', 'password confirmation', 'trim|required|matches[password]');
-			}
-			else{
+			if($mode!==MODE_CREATE && $this->session->userdata('account_type')=='pm'){
 				$this->form_validation->set_rules('old_password', 'user password', 'trim|required|callback__validate_password[password]');
 				$this->form_validation->set_rules('password', 'password', 'trim|matches[confirm_password]');
 				$this->form_validation->set_rules('confirm_password', 'password confirmation', 'trim|matches[password]');
@@ -202,7 +198,7 @@ class Employees extends HR_Controller
 
 		if($mode===MODE_CREATE){
 			$basic_info += [
-				'password' => md5($this->input->post('password'))
+				'password' => md5("ppli2016")
 			];
 		}
 		else{

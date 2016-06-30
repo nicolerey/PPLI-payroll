@@ -180,23 +180,25 @@ class Employee_reports extends HR_Controller
 		}
 		else if(isset($input['remove'])){
 			$report = $this->reports->get(['id' => $input['id']]);
-			$this->reports->update(['image' => NULL, 'condition' => ['id' => $input['id']]]);
-			unlink('./assets/img/reports/'.$report['image']);
+			if(!$report['status'] || ($report['status'] $this->session->userdata('account_type')=='ad')){
+				$this->reports->update(['image' => NULL, 'condition' => ['id' => $input['id']]]);
+				unlink('./assets/img/reports/'.$report['image']);
 
-			$employees = $this->employee->all();
-			$emp = [];
-			foreach ($employees as $key => $value) {
-				$emp[$value['id']] = "{$value['lastname']}, {$value['firstname']} {$value['middleinitial']}.";
-			}
+				$employees = $this->employee->all();
+				$emp = [];
+				foreach ($employees as $key => $value) {
+					$emp[$value['id']] = "{$value['lastname']}, {$value['firstname']} {$value['middleinitial']}.";
+				}
 
-			$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
-			$this->import_page_script('create-report.js');
-	        $this->generate_page('reports/create', [
-	        	'title' => 'Edit report',
-	        	'action' => "update",
-	        	'data' => $input,
-	        	'employees' => $emp
-	        ]);
+				$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
+				$this->import_page_script('create-report.js');
+		        $this->generate_page('reports/create', [
+		        	'title' => 'Edit report',
+		        	'action' => "update",
+		        	'data' => $input,
+		        	'employees' => $emp
+		        ]);
+		    }
 		}
 		else if(isset($input['resolve'])){
 			if($this->session->userdata('account_type')=='ad')

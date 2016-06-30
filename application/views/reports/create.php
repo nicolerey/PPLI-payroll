@@ -73,7 +73,7 @@
             Resolution
           </label>
           <div class="col-sm-9">
-            <?php if(isset($data) && isset($data['image']) && !$data['status']):?>
+            <?php if(isset($data) && isset($data['image']) && (!$data['status'] || ($data['status'] && $this->session->userdata('account_type')=='ad'))):?>
               <div class="col-sm-2">
                 <button type="submit" class="btn btn-danger" name="remove" value="remove">Remove image</button>
               </div>
