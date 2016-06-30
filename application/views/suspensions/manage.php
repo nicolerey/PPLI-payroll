@@ -29,11 +29,11 @@
         <div class="form-group">
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Start date</label>
           <div class="col-sm-2">     
-            <input type="text" class="form-control datepicker" name="start_date" value="<?= (isset($data))?date_format(date_create($data['start_date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+            <input type="text" class="form-control datepicker" name="start_date" value="<?= (isset($data))?date_format(date_create($data['start_date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
           </div>
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> End date</label>
           <div class="col-sm-2">     
-            <input type="text" class="form-control datepicker" name="end_date" value="<?= (isset($data))?date_format(date_create($data['end_date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+            <input type="text" class="form-control datepicker" name="end_date" value="<?= (isset($data))?date_format(date_create($data['end_date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
           </div>
         </div>
         <div class="form-group">
@@ -41,7 +41,7 @@
             Title
           </label>
           <div class="col-sm-3">
-            <input type="text" name="title" value="<?= (isset($data))?$data['title']:'';?>" class="form-control"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+            <input type="text" name="title" value="<?= (isset($data))?$data['title']:'';?>" class="form-control"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
           </div>
         </div>
         <div class="form-group">
@@ -49,7 +49,7 @@
             Employee
           </label>
           <div class="col-sm-3">
-            <select class="form-control" name="employee_id"<?= (isset($data) && $data['status'])?' disabled':'';?>>
+            <select class="form-control" name="employee_id"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>>
               <option value=""></option>
               <?php foreach($employees as $emp_key=>$emp_value):?>
                 <option value="<?= $emp_key;?>"<?= (isset($data) && $emp_key==$data['employee_id'])?' selected':'';?>><?= $emp_value;?></option>
@@ -62,14 +62,14 @@
             Body
           </label>
           <div class="col-sm-6">
-            <textarea name="body" class="form-control" rows="5"<?= (isset($data) && $data['status'])?' disabled':'';?>><?= (isset($data))?$data['body']:'';?></textarea>
+            <textarea name="body" class="form-control" rows="5"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>><?= (isset($data))?$data['body']:'';?></textarea>
           </div>
         </div>
         <!-- /.box-body -->
       </div>
       <div class="box-footer clearfix">
         <a href="<?=$url?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
-        <button type="submit" class="btn btn-success btn-flat" name="submit" value="submit"<?= (isset($data) && $data['status'])?' disabled':'';?>>Submit</button>
+        <button type="submit" class="btn btn-success btn-flat" name="submit" value="submit"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>>Submit</button>
       </div><!-- /.box-footer -->
     </form>
   </div><!-- /.box -->

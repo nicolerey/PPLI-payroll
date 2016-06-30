@@ -29,7 +29,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Date</label>
           <div class="col-sm-2">     
-            <input type="text" class="form-control datepicker" name="date" value="<?= (isset($data))?date_format(date_create($data['date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+            <input type="text" class="form-control datepicker" name="date" value="<?= (isset($data))?date_format(date_create($data['date']), 'm/d/Y'):"";?>"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
           </div>
         </div>
         <div class="form-group">
@@ -37,7 +37,7 @@
             Particular
           </label>
           <div class="col-sm-3">
-            <select class="form-control" name="pay_modifier_id"<?= (isset($data) && $data['status'])?' disabled':'';?>>
+            <select class="form-control" name="pay_modifier_id"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>>
               <option value=""></option>
               <?php foreach($pay_modifier as $particular):?>
                 <option value="<?= $particular['id'];?>"<?= (isset($data) && $particular['id']==$data['pay_modifier_id'])?'selected':'';?>><?= $particular['name'];?></option>
@@ -49,11 +49,11 @@
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Type</label>
           <div class="col-sm-9">
             <label class="radio-inline">
-              <input type="radio" name="type" value="dep"<?= (isset($data) && $data['type']=='dep')?' checked':'';?> onclick="show_field(this);" onchange="detect_change()"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+              <input type="radio" name="type" value="dep"<?= (isset($data) && $data['type']=='dep')?' checked':'';?> onclick="show_field(this);" onchange="detect_change()"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
               Department
             </label>
             <label class="radio-inline">
-              <input type="radio" name="type" value="emp"<?= (isset($data) && $data['type']=='emp')?' checked':'';?> onclick="show_field(this);" onchange="detect_change()"<?= (isset($data) && $data['status'])?' disabled':'';?>/>
+              <input type="radio" name="type" value="emp"<?= (isset($data) && $data['type']=='emp')?' checked':'';?> onclick="show_field(this);" onchange="detect_change()"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>/>
               Employee
             </label>
           </div>
@@ -65,7 +65,7 @@
             Department
           </label>
           <div class="col-sm-3">
-            <select class="form-control" name="department_id"<?= (isset($data) && $data['status'])?' disabled':'';?> onchange="detect_change()">
+            <select class="form-control" name="department_id"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?> onchange="detect_change()">
               <option value=""></option>
               <option value="all"<?= (isset($data) && isset($data['department']) && count($data['department'])>1)?' selected':'';?>>All departments</option>
               <?php foreach($departments as $value):?>
@@ -79,7 +79,7 @@
             Employee
           </label>
           <div class="col-sm-3">
-            <select class="form-control" name="employee_id"<?= (isset($data) && $data['status'])?' disabled':'';?> onchange="detect_change()">
+            <select class="form-control" name="employee_id"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?> onchange="detect_change()">
               <option value=""></option>
               <?php foreach($employees as $emp_key=>$emp_value):?>
                 <option value="<?= $emp_key;?>"<?= (isset($data) && isset($data['employee']) && $emp_key==$data['employee']['employee_id'])?' selected':'';?>><?= $emp_value;?></option>
@@ -94,7 +94,7 @@
             Multiplier
           </label>
           <div class="col-sm-1">
-            <input name="multiplier" class="form-control" type="number"<?= (isset($data) && $data['status'])?' disabled':'';?> value="<?= (isset($data))?$data['multiplier']:'';?>"/>
+            <input name="multiplier" class="form-control" type="number"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?> value="<?= (isset($data))?$data['multiplier']:'';?>"/>
           </div>
         </div>
         <input type="text" name="change" class="change hidden" value="0"/>
@@ -102,7 +102,7 @@
       </div>
       <div class="box-footer clearfix">
         <a href="<?=$url?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
-        <button type="submit" class="btn btn-success btn-flat" name="submit" value="submit"<?= (isset($data) && $data['status'])?' disabled':'';?>>Submit</button>
+        <button type="submit" class="btn btn-success btn-flat" name="submit" value="submit"<?= (isset($data) && $data['status'] && $this->session->userdata('account_type')=='pm')?' disabled':'';?>>Submit</button>
       </div><!-- /.box-footer -->
     </form>
   </div><!-- /.box -->
