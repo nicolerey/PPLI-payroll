@@ -13,7 +13,7 @@
       <h3 class="box-title"><?= $title?></h3>
     </div>
     <form data-action="<?= base_url('employee_suspensions/'.$action);?>" class="form-horizontal">
-      <input type="text" class="hidden" value="<?= (isset($data))?$data['id']:"";?>" name="id"/>
+      <input type="text" class="hidden id" value="<?= (isset($data))?$data['id']:"";?>" name="id"/>
       <div class="box-body">
         <div class="alert alert-info"><p>Fields marked with <span class="fa fa-asterisk text-danger"></span> are required.</p></div>
         <div class="alert alert-danger<?= (isset($image_error))?'':' hidden';?>">
@@ -22,7 +22,7 @@
         <?php if(isset($data) && $this->session->userdata('account_type')=='ad' && !$data['status']):?>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-success btn-flat pull-right" name="resolve" value="resolve"><i class="fa fa-check"></i> Resolve report</button>
+              <button type="button" data-url="<?= base_url('employee_suspensions/approve');?>" class="btn btn-success btn-flat pull-right approve"><i class="fa fa-check"></i> Resolve report</button>
             </div>
           </div>
         <?php endif;?>

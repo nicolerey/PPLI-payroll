@@ -27,4 +27,29 @@ $(document).ready(function(){
 			submitBtn.removeAttr('disabled');
 		});
 	});
+
+	$('.approve').on('click', function(){
+		var that = $('form'),
+			submitBtn = that.find('[type=submit]'),
+			msgBox = $('.alert-danger');
+
+		submitBtn.attr('disabled', 'disabled');
+		msgBox.addClass('hidden');
+
+		$.post($(this).data('url'), {id: $('.id').val(), approve: true})
+		.done(function(response){
+			console.log(response);
+			if(response.result){
+				window.location.href = $('.cancel').attr('href');
+				return;
+			}
+			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
+			$('html, body').animate({scrollTop: 0}, 'slow');
+		})
+		.fail(function(){
+			alert('An internal server error has occured');
+		}).always(function(){
+			submitBtn.removeAttr('disabled');
+		});
+	});
 });

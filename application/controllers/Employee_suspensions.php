@@ -4,7 +4,7 @@ class Employee_suspensions extends HR_Controller
 {
 
 	protected $tab_title = 'Employee suspensions';
-	protected $active_nav = NAV_REPORTS;
+	protected $active_nav = NAV_SUSPENSIONS;
 
 	public function __construct()
 	{
@@ -126,6 +126,40 @@ class Employee_suspensions extends HR_Controller
 		$this->output->set_output(json_encode([
 			'result' => FALSE,
 			'messages' => ['Cannot update suspension. Try again later.']
+		]));
+		return;
+	}
+
+	public function approve()
+	{
+		$this->output->set_content_type('json');
+
+		if($this->session->userdata('account_type')=='ad'){
+			$input = $this->input->post();
+			$data = [
+				'status' => TRUE,
+				'last_updated_by' => $this->session->userdata('id'),
+				'resolved_by' => $this->session->userdata('id'),
+				'condition' => ['id' => $input['id']]
+			];
+
+			if($this->suspensions->update($data)){
+				$this->output->set_output(json_encode([
+					'result' => TRUE
+				]));
+				return;
+			}
+
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => ['Cannot approve bonus. Try again later.']
+			]));
+			return;
+		}
+
+		$this->output->set_output(json_encode([
+			'result' => FALSE,
+			'messages' => ['Account is invalid.']
 		]));
 		return;
 	}
