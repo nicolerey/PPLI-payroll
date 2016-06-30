@@ -424,12 +424,14 @@ class Payslip_model extends CI_Model
 		return $data;
 	}
 
-	public function all($employee_id = FALSE)
+	public function all($employee_id = FALSE, $condition = FALSE)
 	{
 		$this->db->select('p.start_date, p.batch_id, p.approval_status, p.end_date, p.id, e.firstname, e.middleinitial, e.lastname')->from('payroll AS p')->join('employees AS e', 'p.employee_id = e.id');
 		if($employee_id){
 			$this->db->where('employee_id', $employee_id);
 		}
+		if($condition)
+			$this->db->where($condition);
 		$this->db->order_by('end_date', 'DESC');
 		return $this->db->get()->result_array();
 	}
