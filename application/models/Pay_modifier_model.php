@@ -10,6 +10,17 @@ class Pay_modifier_model extends CI_Model
 		parent::__construct();
 	}
 
+	public function all_with_condition($condition = FALSE, $pm_flag = FALSE)
+	{
+		if($pm_flag)
+			$this->db->where('allow_pm', 1);
+		if($condition)
+			$this->db->where($condition);
+
+		$this->db->order_by('name', 'ASC');
+		return $this->db->get($this->table)->result_array();
+	}
+
 	public function all($filter_result = FALSE, $pm_flag = FALSE)
 	{
 		if($pm_flag)

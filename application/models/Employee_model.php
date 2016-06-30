@@ -186,7 +186,7 @@ class Employee_model extends CI_Model
 
     public function get_position($id)
     {
-        $this->db->select('p.name, p.id, p.workday')->from('employee_positions AS emppos, positions AS p');
+        $this->db->select('p.name, p.id, p.workday, p.daily_rate')->from('employee_positions AS emppos, positions AS p');
         $this->db->where('p.id = emppos.position_id');
         $this->db->where('emppos.`to` IS NULL', FALSE, FALSE)->where('emppos.employee_id', $id);
         return $this->db->get()->row_array();
@@ -195,11 +195,14 @@ class Employee_model extends CI_Model
     public function get_attendance($id, $from, $to, $upload_batch_id = FALSE)
     {
         if($upload_batch_id)
-            $this->db->where('upload_batch', $upload_batch_id);
+            $this->db->where('ea.upload_batch', $upload_batch_id);
 
-        $this->db->where("DATE(datetime_in) >= '{$from}' AND DATE(datetime_in) <= '{$to}'", FALSE, FALSE);
-        $this->db->where('datetime_in IS NOT NULL AND datetime_out IS NOT NULL', FALSE, FALSE);
-        return $this->db->get_where('employee_attendance', ['employee_id' => $id])->result_array();
+        $this->db->join('employee_suspensions as es', 'es.employee_id=ea.employee_id');
+        $this->db->where('DATE(es.start_date) >= DATE(ea.datetime_in) AND DATE(es.end_date) <= DATE(ea.datetime_in)');
+
+        $this->db->where("DATE(ea.datetime_in) >= '{$from}' AND DATE(ea.datetime_in) <= '{$to}'", FALSE, FALSE);
+        $this->db->where('ea.datetime_in IS NOT NULL AND ea.datetime_out IS NOT NULL', FALSE, FALSE);
+        return $this->db->get_where('employee_attendance as ea', ['ea.employee_id' => $id])->result_array();
     }
 
     public function get_filed_requests($id)

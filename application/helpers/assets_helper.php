@@ -35,3 +35,12 @@ if(!function_exists('plugin_css'))
 		return "<link href=\"{$link}\" rel=\"stylesheet\"/>";
 	}
 }
+
+if(!function_exists('image'))
+{
+	function image($filename, $width, $height, $style = FALSE)
+	{
+		$link = base_url("assets/img/reports/{$filename}");
+		return  "<img src=\"{$link}\" class=\"img-rounded\" width=\"{$width}\" height=\"{$height}\" style=\"{$style}\">";
+	}
+}

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 24, 2016 at 07:57 PM
+-- Generation Time: Jun 30, 2016 at 08:55 AM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 7.0.5
 
@@ -19,6 +19,84 @@ SET time_zone = "+00:00";
 --
 -- Database: `payroll`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bonus`
+--
+
+CREATE TABLE `bonus` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `pay_modifier_id` int(10) UNSIGNED NOT NULL,
+  `date` date NOT NULL,
+  `type` enum('dep','emp') NOT NULL,
+  `multiplier` int(11) NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int(10) UNSIGNED NOT NULL,
+  `last_updated_by` int(10) UNSIGNED NOT NULL,
+  `approved_by` int(10) UNSIGNED DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `bonus`
+--
+
+INSERT INTO `bonus` (`id`, `pay_modifier_id`, `date`, `type`, `multiplier`, `status`, `created_by`, `last_updated_by`, `approved_by`, `date_created`) VALUES
+(4, 5, '2016-06-01', 'emp', 1, 0, 3, 3, NULL, '2016-06-30 05:32:32'),
+(5, 6, '2016-06-01', 'dep', 1, 0, 3, 3, NULL, '2016-06-30 05:33:37'),
+(7, 6, '2016-06-02', 'dep', 1, 1, 3, 3, 3, '2016-06-30 05:43:22'),
+(9, 6, '2016-06-22', 'dep', 2, 1, 3, 3, 3, '2016-06-30 06:28:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bonus_departments`
+--
+
+CREATE TABLE `bonus_departments` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `bonus_id` int(10) UNSIGNED NOT NULL,
+  `department_id` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `bonus_departments`
+--
+
+INSERT INTO `bonus_departments` (`id`, `bonus_id`, `department_id`) VALUES
+(1, 5, 6),
+(4, 7, 6),
+(5, 7, 7),
+(8, 9, 6),
+(9, 9, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bonus_employees`
+--
+
+CREATE TABLE `bonus_employees` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `bonus_id` int(10) UNSIGNED NOT NULL,
+  `employee_id` int(10) UNSIGNED NOT NULL,
+  `daily_wage` decimal(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `bonus_employees`
+--
+
+INSERT INTO `bonus_employees` (`id`, `bonus_id`, `employee_id`, `daily_wage`) VALUES
+(2, 4, 3, '11.11'),
+(3, 5, 3, '11.11'),
+(4, 5, 4, '11.11'),
+(5, 7, 3, '11.11'),
+(6, 7, 4, '11.11'),
+(11, 9, 3, '11.11'),
+(12, 9, 4, '11.11');
 
 -- --------------------------------------------------------
 
@@ -100,7 +178,7 @@ CREATE TABLE `employees` (
 
 INSERT INTO `employees` (`id`, `id_number`, `firstname`, `middleinitial`, `lastname`, `birthdate`, `birthplace`, `gender`, `civil_status`, `nationality`, `religion`, `full_address`, `email_address`, `mobile_number`, `date_hired`, `login_password`, `sss_number`, `pagibig_number`, `tin_number`, `rfid_uid`, `password`, `is_locked`, `account_type`, `created_at`) VALUES
 (3, 2, 'JULITO', 'G', 'CASTANEDA', '1995-06-20', 'Cebu City', 'M', 'w', 'Filipino', 'Roman Catholic', 'Mandaue City, Cebu', 'natabioadr@gmail.com', '09434524412', '2016-12-15', NULL, '1232', '13', 'ss', '00000003', '21232f297a57a5a743894a0e4a801fc3', 0, 'ad', '2016-01-17 02:07:01'),
-(4, NULL, 'dasdas', 'dsadas', 'dsadsad', '2016-06-20', '', 'M', 'sg', '', '', '', 'nicolereya@gmail.com', '09234251308', '2016-06-21', NULL, '12345', '123456', '', NULL, '21232f297a57a5a743894a0e4a801fc3', 0, 'pm', '2016-06-22 03:52:37');
+(4, NULL, 'dasdas', 'd', 'dsadsad', '2016-06-20', '', 'M', 'sg', '', '', '', 'nicolereya@gmail.com', '09234251308', '2016-06-21', NULL, '12345', '123456', '', NULL, '21232f297a57a5a743894a0e4a801fc3', 0, 'pm', '2016-06-22 03:52:37');
 
 -- --------------------------------------------------------
 
@@ -176,6 +254,35 @@ INSERT INTO `employee_positions` (`id`, `employee_id`, `position_id`, `from`, `t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `employee_reports`
+--
+
+CREATE TABLE `employee_reports` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `employee_id` int(10) UNSIGNED NOT NULL,
+  `title` text NOT NULL,
+  `date` date NOT NULL,
+  `body` text NOT NULL,
+  `image` text,
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int(10) UNSIGNED NOT NULL,
+  `last_updated_by` int(10) UNSIGNED NOT NULL,
+  `resolved_by` int(10) UNSIGNED NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `employee_reports`
+--
+
+INSERT INTO `employee_reports` (`id`, `employee_id`, `title`, `date`, `body`, `image`, `status`, `created_by`, `last_updated_by`, `resolved_by`, `date_created`) VALUES
+(4, 4, 'dasdas', '2016-06-29', 'dsada', '20160625212234_1.jpg', 1, 3, 3, 3, '2016-06-28 15:20:37'),
+(5, 4, 'dasdsadsadas', '2016-06-29', 'dasdas', '20160625211716_1.jpg', 1, 3, 3, 3, '2016-06-28 15:30:05'),
+(6, 3, 'dasdsa', '2016-06-07', 'dasdsadas', NULL, 0, 3, 3, 3, '2016-06-29 10:48:22');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `employee_requests`
 --
 
@@ -195,6 +302,34 @@ CREATE TABLE `employee_requests` (
   `is_acknowledged` tinyint(1) NOT NULL DEFAULT '0',
   `halfday` enum('am','pm') COLLATE utf8_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `employee_suspensions`
+--
+
+CREATE TABLE `employee_suspensions` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `employee_id` int(10) UNSIGNED NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `title` text NOT NULL,
+  `body` text NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int(10) UNSIGNED NOT NULL,
+  `last_updated_by` int(10) UNSIGNED NOT NULL,
+  `resolved_by` int(10) UNSIGNED DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `employee_suspensions`
+--
+
+INSERT INTO `employee_suspensions` (`id`, `employee_id`, `start_date`, `end_date`, `title`, `body`, `status`, `created_by`, `last_updated_by`, `resolved_by`, `date_created`) VALUES
+(1, 3, '2016-06-23', '2016-06-03', 'asdasdas', 'dasdasdas', 0, 3, 3, 3, '2016-06-29 13:40:54'),
+(3, 3, '2016-06-01', '2016-06-02', 'sadsad', 'dasdasda', 0, 3, 3, 3, '2016-06-29 14:14:37');
 
 -- --------------------------------------------------------
 
@@ -372,6 +507,32 @@ INSERT INTO `salary_particulars` (`id`, `position_id`, `particulars_id`, `amount
 --
 
 --
+-- Indexes for table `bonus`
+--
+ALTER TABLE `bonus`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `pay_modifier_id` (`pay_modifier_id`),
+  ADD KEY `created_by` (`created_by`),
+  ADD KEY `last_updated_by` (`last_updated_by`),
+  ADD KEY `approved_by` (`approved_by`);
+
+--
+-- Indexes for table `bonus_departments`
+--
+ALTER TABLE `bonus_departments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `bonus_id` (`bonus_id`),
+  ADD KEY `department_id` (`department_id`);
+
+--
+-- Indexes for table `bonus_employees`
+--
+ALTER TABLE `bonus_employees`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `bonus_id` (`bonus_id`),
+  ADD KEY `employee_id` (`employee_id`);
+
+--
 -- Indexes for table `departments`
 --
 ALTER TABLE `departments`
@@ -424,6 +585,16 @@ ALTER TABLE `employee_positions`
   ADD KEY `employee_positions_position_id_foreign_idx` (`position_id`);
 
 --
+-- Indexes for table `employee_reports`
+--
+ALTER TABLE `employee_reports`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `created_by` (`created_by`),
+  ADD KEY `last_updated_by` (`last_updated_by`),
+  ADD KEY `resolved_by` (`resolved_by`),
+  ADD KEY `employee_id` (`employee_id`);
+
+--
 -- Indexes for table `employee_requests`
 --
 ALTER TABLE `employee_requests`
@@ -431,6 +602,16 @@ ALTER TABLE `employee_requests`
   ADD KEY `employee_requests_sender_id_foreign_idx` (`sender_id`),
   ADD KEY `employee_requests_department_id_foreign_idx` (`department_id`),
   ADD KEY `employee_requests_approved_by_foreign_idx` (`approved_by`);
+
+--
+-- Indexes for table `employee_suspensions`
+--
+ALTER TABLE `employee_suspensions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `employee_id` (`employee_id`),
+  ADD KEY `created_by` (`created_by`),
+  ADD KEY `last_updated_by` (`last_updated_by`),
+  ADD KEY `resolved_by` (`resolved_by`);
 
 --
 -- Indexes for table `loans`
@@ -489,6 +670,21 @@ ALTER TABLE `salary_particulars`
 --
 
 --
+-- AUTO_INCREMENT for table `bonus`
+--
+ALTER TABLE `bonus`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+--
+-- AUTO_INCREMENT for table `bonus_departments`
+--
+ALTER TABLE `bonus_departments`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+--
+-- AUTO_INCREMENT for table `bonus_employees`
+--
+ALTER TABLE `bonus_employees`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+--
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
@@ -519,10 +715,20 @@ ALTER TABLE `employee_departments`
 ALTER TABLE `employee_positions`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 --
+-- AUTO_INCREMENT for table `employee_reports`
+--
+ALTER TABLE `employee_reports`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+--
 -- AUTO_INCREMENT for table `employee_requests`
 --
 ALTER TABLE `employee_requests`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `employee_suspensions`
+--
+ALTER TABLE `employee_suspensions`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `loans`
 --
@@ -563,6 +769,29 @@ ALTER TABLE `salary_particulars`
 --
 
 --
+-- Constraints for table `bonus`
+--
+ALTER TABLE `bonus`
+  ADD CONSTRAINT `bonus_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bonus_created_by` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bonus_last_updated_by` FOREIGN KEY (`last_updated_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bonus_pay_modifier_id` FOREIGN KEY (`pay_modifier_id`) REFERENCES `pay_modifiers` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `bonus_departments`
+--
+ALTER TABLE `bonus_departments`
+  ADD CONSTRAINT `bonus_departments_bonus_id` FOREIGN KEY (`bonus_id`) REFERENCES `bonus` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bonus_departments_department_id` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `bonus_employees`
+--
+ALTER TABLE `bonus_employees`
+  ADD CONSTRAINT `bonus_employees_bonus_id` FOREIGN KEY (`bonus_id`) REFERENCES `bonus` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bonus_employees_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `department_supervisors`
 --
 ALTER TABLE `department_supervisors`
@@ -594,12 +823,30 @@ ALTER TABLE `employee_positions`
   ADD CONSTRAINT `employee_positions_position_id_foreign` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
+-- Constraints for table `employee_reports`
+--
+ALTER TABLE `employee_reports`
+  ADD CONSTRAINT `employee_reports_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_reports_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_reports_last_updated_by_foreign` FOREIGN KEY (`last_updated_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_reports_resolved_by_foreign` FOREIGN KEY (`resolved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `employee_requests`
 --
 ALTER TABLE `employee_requests`
   ADD CONSTRAINT `employee_requests_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `employee_requests_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `employee_requests_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `employee_suspensions`
+--
+ALTER TABLE `employee_suspensions`
+  ADD CONSTRAINT `employee_suspensions_created_by` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_suspensions_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_suspensions_last_updated_by` FOREIGN KEY (`last_updated_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `employee_suspensions_resolved_by` FOREIGN KEY (`resolved_by`) REFERENCES `employees` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `payment_terms`

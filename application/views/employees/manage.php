@@ -29,7 +29,7 @@
                 <span class="help-block">First name</span>
               </div>
               <div class="col-sm-2">
-                <input type="text" class="form-control" name="middleinitial" value="<?= preset($data, 'middleinitial', '')?>" />
+                <input type="text" class="form-control" name="middleinitial" value="<?= preset($data, 'middleinitial', '')?>" maxlength="1"/>
                 <span class="help-block">Middle initial</span>
               </div>
             </div>

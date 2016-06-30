@@ -99,6 +99,9 @@ define('NAV_MY_ATTENDANCE', 'my_attendance');
 define('NAV_PAY_MODIFIERS', 'pay_modifiers');
 define('NAV_VIEW_ATTENDANCE', 'view_attendance');
 define('NAV_LOANS', 'loans');
+define('NAV_REPORTS', 'employee_reports');
+define('NAV_SUSPENSIONS', 'employee_suspensions');
+define('NAV_BONUSES', 'bonus');
 
 define('SUBNAV_EMPLOYEES', 'employee');
 define('SUBNAV_DEPARTMENTS', 'department');

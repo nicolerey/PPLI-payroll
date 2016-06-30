@@ -59,6 +59,18 @@
             <li class="<?= $active_nav === NAV_LOANS ? 'active' : '' ?>">
                 <a href="<?= "{$url}loan" ?>"><i class="fa fa-usd"></i> <span> Loans</span></a>
             </li>
+
+            <li class="<?= $active_nav === NAV_REPORTS ? 'active' : '' ?>">
+                <a href="<?= "{$url}employee_reports" ?>"><i class="fa fa-file-text-o"></i> <span> Employee Reports</span></a>
+            </li>
+
+            <li class="<?= $active_nav === NAV_SUSPENSIONS ? 'active' : '' ?>">
+                <a href="<?= "{$url}employee_suspensions" ?>"><i class="fa fa-calendar-times-o"></i> <span> Employee Suspensions</span></a>
+            </li>
+
+            <li class="<?= $active_nav === NAV_BONUSES ? 'active' : '' ?>">
+                <a href="<?= "{$url}bonus" ?>"><i class="fa fa-plus-circle"></i> <span> Bonuses</span></a>
+            </li>
         </ul><!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->

@@ -13,7 +13,7 @@
       <table class="table table-hover table-striped">
       	<thead>
 			<tr>
-        <th><i class="fa fa-lock"></i></th><th>Employee #</th><th>Last Name</th><th>First name</th><th>Middle initial</th><th>Gender</th><th>Department</th><th>Position</th><th>Date hired</th><th></th>
+        <th><i class="fa fa-lock"></i></th><th>Name</th><th>Employee #</th><th>Gender</th><th>Department</th><th>Position</th><th>Date hired</th><th></th>
       </tr>      		
       	</thead>
       	<tbody>
@@ -23,10 +23,12 @@
       		<?php foreach($items AS $row):?>
       			<tr data-pk="<?= $row['id']?>" class="employee_row_fields">
               <td><input type="checkbox" class="lock" <?= intval($row['is_locked']) ? 'checked="checked"' : ''?>/></td>
-              <td><a href="<?= base_url("employees/edit/{$row['id']}")?>"><?= $row['id']?></a></td>
-      				<td><?= $row['lastname']?></td>
-      				<td><?= $row['firstname']?></td>
-      				<td><?= $row['middleinitial']?></td>
+              <td>
+                <a href="<?= base_url("employees/edit/{$row['id']}")?>">
+                  <?= "{$row['lastname']}, {$row['firstname']} {$row['middleinitial']}.";?>
+                </a>
+              </td>
+              <td><?= $row['id']?></td>
       				<td><?= $row['gender'] === 'M' ? 'Male' : 'Female' ?></td>
               <td><?= $row['department'] ?></td>
               <td><?= $row['position'] ?></td>
