@@ -12,6 +12,7 @@
     <?= plugin_css('font-awesome/css/font-awesome.min.css')?>
     <!-- Theme style -->
     <?= css('AdminLTE.min.css')?>
+    <?= css('select2.min.css')?>
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
           page. However, you can choose any other skin. Make sure you
           apply the skin class to the body tag so the changes take effect.

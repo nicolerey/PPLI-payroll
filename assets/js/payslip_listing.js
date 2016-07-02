@@ -1,5 +1,17 @@
 (function($){
 	$(document).ready(function(){
+		$('.search_employee').select2();
+
+		$('#search_employee').on('click', function(){
+			$.post($(this).data('url'), {employee_id: $('.search_employee').val()})
+			.done(function(response){
+				$('#table_body').html(response);
+			})
+			.fail(function(){
+				alert('An internal error has occured. Please try again.');
+			});
+		});
+
 		$('#approve_button').on('click', function(){
 			var msgBox = $('.alert-danger').addClass('hidden');
 

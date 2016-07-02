@@ -17,6 +17,18 @@
   <div class="box box-solid">
     <div class="box-body no-padding">
       <div class="alert alert-danger hidden"><ul class="list-unstyled"></ul></div>
+      <div class="form-inline" style="padding-top: 10px; padding-left: 5px;">
+        <div class="form-group">
+          <label>Employee name</label>
+          <select class="search_employee form-control">
+            <option value=""></option>
+            <?php foreach($employee as $emp):?>
+              <option value="<?= $emp['id'];?>"><?= "{$emp['lastname']}, {$emp['firstname']} {$emp['middleinitial']}."?></option>
+            <?php endforeach;?>
+          </select>
+        </div>
+        <button type="button" class="btn btn-default" id="search_employee" data-url="<?= base_url('my_payslip/search_employee')?>"><i class="fa fa-search"></i> Search</button>
+      </div>
       <form class="form-horizontal" action="<?= base_url('my_payslip/approve_payslip');?>" method="POST">
         <table class="table table-hover table-striped">
         	<thead>
@@ -27,7 +39,7 @@
             <th>#</th><th>Batch ID</th><th>Employee Name</th><th>From</th><th>To</th><th>Status</th>
           </tr>
         	</thead>
-        	<tbody>
+        	<tbody id="table_body">
             <?php if(empty($items)):?>
               <tr><td class="text-center" colspan="7">Nothing to display</td></tr>
             <?php endif;?>

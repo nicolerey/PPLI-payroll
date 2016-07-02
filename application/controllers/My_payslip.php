@@ -13,12 +13,14 @@ class My_payslip extends HR_Controller
 
 	public function index()
 	{
+		$this->load->model(['Employee_model' => 'employee']);
 		$current_date = date('Y-m-d');
 		$previous_date = date_format(date_sub(date_create($current_date), date_interval_create_from_date_string("1 month")), 'Y-m-d');
 
-		$this->import_page_script(['payslip_listing.js', 'jquery.printPage.js']);
+		$this->import_page_script(['payslip_listing.js', 'jquery.printPage.js', 'select2.min.js']);
 		$this->generate_page('my-payslip/listing', [
-			'items' => $this->payslip->all(FALSE, "DATE(end_date) >= '{$previous_date}' AND DATE(end_date) <= '{$current_date}'")
+			'items' => $this->payslip->all(FALSE, "DATE(end_date) >= '{$previous_date}' AND DATE(end_date) <= '{$current_date}'"),
+			'employee' => $this->employee->all()
 		]);
 	}
 
@@ -47,6 +49,13 @@ class My_payslip extends HR_Controller
 			'employee_data' => $employee,
 			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)
 		]);
+	}
+
+	public function search_employee()
+	{
+		$input = $this->input->post();
+		$items = $this->payslip->all(FALSE, $input);
+		$this->load->view('my-payslip/listing_prototype', ['items' => $items]);
 	}
 
 	public function approve_payslip()
