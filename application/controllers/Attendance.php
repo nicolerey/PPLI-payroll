@@ -159,7 +159,6 @@ class Attendance extends HR_Controller
 					//this will hold first name and MI
 					$temp = explode(" ", $dif_val[1]);
 					$mi_index = count($temp) - 1;
-					$middleinitial = trim(rtrim($temp[$mi_index], '.'));
 					unset($temp[$mi_index]);
 
 					$firstname = trim(implode(" ", $temp));
@@ -182,8 +181,7 @@ class Attendance extends HR_Controller
 
 					$employee_name = [
 						'firstname' => $firstname,
-						'lastname' => $lastname,
-						'middleinitial' => $middleinitial
+						'lastname' => $lastname
 					];
 
 					$res = $this->employee->get_employee($employee_name);

@@ -163,7 +163,6 @@ class Employees extends HR_Controller
 		}
 		$this->form_validation->set_rules('firstname', 'first name', 'required');
 		$this->form_validation->set_rules('lastname', 'last name', 'required');
-		$this->form_validation->set_rules('middleinitial', 'middle initial', 'required');
 		$this->form_validation->set_rules('account_type', 'account type', 'required|in_list[ad,em,pm]', ['in_list' => 'Please provide a valid %s.']);
 		$this->form_validation->set_rules('birthdate', 'date of birth', 'required|callback__validate_date');
 		$this->form_validation->set_rules('gender', 'gender', 'required|in_list[M,F]', ['in_list' => 'The %s can only be male or female.']);
