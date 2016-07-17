@@ -222,6 +222,7 @@ class Payslip_model extends CI_Model
 		}
 
 		$data['daily_wage'] = $position['daily_rate'];
+		$data['daily_wage_units'] = 1;
 		$data['late_penalty'] = $position['late_penalty'];
 
 		$data['total_regular_days'] = round($total_regular_days, 2);
@@ -303,6 +304,7 @@ class Payslip_model extends CI_Model
 			'employee_id' => $employee_number,
 			'start_date' => $range[0],
 			'end_date' => $range[1],
+			'daily_wage_units' => 1,
 			'days_rendered' => $payslip['total_regular_days'],
 			'overtime_hours_rendered' => $payslip['total_overtime_hrs'],
 			'late_minutes' => $payslip['total_late_minutes'],
