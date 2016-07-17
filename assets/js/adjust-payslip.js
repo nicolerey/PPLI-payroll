@@ -32,6 +32,7 @@ function calculate_total_amount(){
 	$('.loan_payment_amount').each(function(){
 		total_deduction_amount += Number(($(this).html()).replace(",", ""));
 	});
+	total_deduction_amount += Number($('.late_penalty').html());
 
 	var net_pay = total_additional_amount - total_deduction_amount;
 

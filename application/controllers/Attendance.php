@@ -87,7 +87,7 @@ class Attendance extends HR_Controller
 				$data[$x]['name'] = $name['firstname']." ".$name['middleinitial']." ".$name['lastname']." ({$attendance['employee_id']})";
 				$data[$x]['datetime_in'] = ($attendance['datetime_in']) ? date_format(date_create($attendance['datetime_in']), 'Y-m-d h:i A') : NULL;
 				$data[$x]['datetime_out'] = ($attendance['datetime_out']) ? date_format(date_create($attendance['datetime_out']), 'Y-m-d h:i A') : NULL;
-				if($attendance['datetime_out']){
+				if($attendance['datetime_out'] && $attendance['datetime_in']){
 					$date_diff = date_diff(date_create($attendance['datetime_out']), date_create($attendance['datetime_in']));
 					$data[$x]['total_hours'] = number_format(($date_diff->d * 24) + $date_diff->h + ($date_diff->i / 60) + ($date_diff->s / 60 / 60), 2);
 				}
@@ -99,8 +99,8 @@ class Attendance extends HR_Controller
 		}
 
 		$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js', 'x_editable/bootstrap3-editable/js/bootstrap-editable.min.js', 'bootstrap-datetimepicker-smalot/js/bootstrap-datetimepicker.min.js', 'moment.js']);
-		$this->import_page_script(['view-attendance.js']);
-		$this->generate_page('attendance/view', array('data'=>$data, 'search_employee'=>$search_employee, 'test'=>$test));
+		$this->import_page_script(['view-attendance.js', 'select2.min.js']);
+		$this->generate_page('attendance/view', array('data'=>$data, 'search_employee'=>$search_employee, 'test'=>$test, 'employee' => $this->employee->all()));
 	}
 
 	function dos2unix($s) {

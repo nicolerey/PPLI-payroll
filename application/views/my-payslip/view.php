@@ -183,6 +183,14 @@
                   </tr>
                 </thead>
                 <tbody class="deduction_particulars_container">
+                  <tr>
+                    <td></td>
+                    <td>Late penalties</td>
+                    <td>-</td>
+                    <td class="late_penalty">
+                      <?= number_format($payslip['current_late_penalty'] * $payslip['late_minutes'], 2);?>
+                    </td>
+                  </tr>
                   <?php if($payslip['particulars']['deductions']):?>
                     <?php foreach($payslip['particulars']['deductions'] as $key=>$deductions):?>
                       <?php if($key!=='loan'):?>
@@ -267,7 +275,7 @@
         <!-- <div class=> -->
       </div><!-- /.box-body -->
       <div class="box-footer clearfix">
-        <a href="<?=$url?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
+        <a href="<?= base_url('my_payslip/view_payslip/'.$batch_id)?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
         <button type="submit" class="btn btn-success btn-flat">Save payslip</button>
       </div><!-- /.box-footer -->
     </form>

@@ -91,6 +91,7 @@ class My_payslip extends HR_Controller
 
 		$pm_flag = ($this->session->userdata('account_type')=='pm')?TRUE:FALSE;
 		$this->generate_page('my-payslip/view', [
+			'batch_id' => $payslip['batch_id'],
 			'payslip' => $payslip,
 			'employee_data' => $employee,
 			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)

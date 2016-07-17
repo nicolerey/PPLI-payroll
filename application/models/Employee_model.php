@@ -201,9 +201,6 @@ class Employee_model extends CI_Model
         $this->db->where('ea.datetime_in IS NOT NULL AND ea.datetime_out IS NOT NULL');
         $employee_attendance_result =  $this->db->get_where('employee_attendance as ea', ['ea.employee_id' => $id])->result_array();
 
-        echo "<pre>";
-        print_r($employee_attendance_result);
-
         $data = [];
         foreach ($employee_attendance_result as $key => $value) {
             $this->db->where("('{$value['datetime_in']}' BETWEEN start_date AND end_date)");

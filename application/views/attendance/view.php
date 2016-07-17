@@ -14,7 +14,12 @@
             <?php if(isset($search_employee)):?>
                <div class="form-group">
                   <label>Employee number</label>
-                  <input type="number" class="form-control" name="employee_number" value="<?= $this->input->get('employee_number')?>">
+                  <select class="search_employee form-control" name="employee_number">
+                    <option value=""></option>
+                    <?php foreach($employee as $emp):?>
+                      <option value="<?= $emp['id'];?>"><?= "{$emp['lastname']}, {$emp['firstname']} {$emp['middleinitial']}."?></option>
+                    <?php endforeach;?>
+                  </select>
                 </div>
             <?php endif;?>
             <div class="form-group">

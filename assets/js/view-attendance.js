@@ -1,6 +1,8 @@
 var attendance_row_index = [];
 
-$(document).ready(function(){
+$(document).ready(function(){    
+    $('.search_employee').select2();
+
     $('.authorization_fail').hide();
 
 	$.fn.editable.defaults.mode = 'popup';
