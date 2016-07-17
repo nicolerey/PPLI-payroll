@@ -86,7 +86,7 @@
                   <td>Daily</td>
                   <td>-</td>
                   <td>-</td>
-                  <td class="particular_amount"><?= number_format($payslip['overtime_pay'], 2);?></td>
+                  <td class="particular_amount"><?= number_format($payslip['overtime_pay'] * $payslip['overtime_hours_rendered'], 2);?></td>
                 </tr>
                 <?php if($payslip['particulars']['additionals']):?>
                   <?php foreach($payslip['particulars']['additionals'] as $additionals):?>
