@@ -185,9 +185,6 @@ class Payslip_model extends CI_Model
 								]);
 							}
 
-							echo "<pre>";
-							print_r($emp_att);
-
 							break;
 						}
 					}
