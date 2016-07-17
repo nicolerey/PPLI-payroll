@@ -315,12 +315,9 @@ class Employee_model extends CI_Model
         return $this->db->get_where('employee_attendance', ['id' => $id])->row_array();
     }
 
-    public function insert_attendance($data, $type = "NORMAL")
+    public function insert_attendance($data)
     {
-        if($type=="NORMAL")
-            return $this->db->insert('employee_attendance', $data);
-        else if($type=="BATCH")
-            return $this->db->insert_batch('employee_attendance', $data);
+        return $this->db->insert_batch('employee_attendance', $data);
     }
 
     public function attendance($id = FALSE, $start_date = FALSE, $end_date = FALSE, $upload_batch_id = FALSE)
