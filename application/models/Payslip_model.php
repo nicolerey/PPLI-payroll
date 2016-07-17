@@ -128,7 +128,7 @@ class Payslip_model extends CI_Model
 
 									if($datetime_out>$second_workday_date2){
 										$time_diff = date_diff($second_workday_date2, $datetime_in);
-										$t_d = date_diff($datetime_out, $datetime_in);
+										$t_d = date_diff($datetime_out, $second_workday_date2);
 										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->i / 60 / 60));
 									}
 									else
@@ -142,7 +142,7 @@ class Payslip_model extends CI_Model
 
 									if($datetime_out>$second_workday_date2){
 										$time_diff = date_diff($second_workday_date2, $second_workday_date1);
-										$t_d = date_diff($datetime_out, $datetime_in);
+										$t_d = date_diff($datetime_out, $second_workday_date2);
 										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->i / 60 / 60));
 									}
 									else
@@ -184,6 +184,9 @@ class Payslip_model extends CI_Model
 									'overtime' => $ot
 								]);
 							}
+
+							echo "<pre>";
+							print_r($emp_att);
 
 							break;
 						}
@@ -233,7 +236,7 @@ class Payslip_model extends CI_Model
 		$total_regular_hrs = 0;
 		$total_late_minutes = 0;
 		$total_regular_days = 0;
-		$data['regular_overtime_pay'] = 0;
+		$data['regular_overtime_pay'] = $position['daily_rate'] * ($position['overtime_rate'] / 100);
 		if(!empty($emp_att)){
 			foreach ($emp_att as $key => $value) {
 				if($value['total_late']<=$position['allowed_late_period']){
@@ -242,9 +245,6 @@ class Payslip_model extends CI_Model
 					$total_regular_hrs += $value['total_working_hours'];
 
 					$total_overtime_hrs += floor($value['overtime']);
-
-					$overtime_hrly = $position['daily_rate'] * ($position['overtime_rate'] / 100);
-					$data['regular_overtime_pay'] += round($overtime_hrly * floor($value['overtime']), 2);
 
 					if($value['total_working_hours']>=$pos_workday[$value['workday_index']]['total_working_hours'])
 						$total_regular_days += 1;
