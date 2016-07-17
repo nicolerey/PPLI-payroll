@@ -32,11 +32,8 @@ class position_model extends CI_Model
 
 	public function create($data)
 	{
-		$particulars = [];
-		if(!empty($data['particulars'])){
-			$particulars = $data['particulars'];
-			unset($data['particulars']);
-		}
+		$particulars = $data['particulars'];
+		unset($data['particulars']);
 
 		$this->db->insert($this->table, $data);
 
@@ -50,7 +47,7 @@ class position_model extends CI_Model
             $this->db->insert_batch('salary_particulars', $particulars);
         }
 
-        return;
+        return TRUE;
 	}
 
 	public function update($id, $data)

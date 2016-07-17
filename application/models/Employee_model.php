@@ -186,7 +186,7 @@ class Employee_model extends CI_Model
 
     public function get_position($id)
     {
-        $this->db->select('p.name, p.id, p.workday, p.daily_rate')->from('employee_positions AS emppos, positions AS p');
+        $this->db->select('p.name, p.id, p.workday, p.daily_rate, p.overtime_rate, p.late_penalty')->from('employee_positions AS emppos, positions AS p');
         $this->db->where('p.id = emppos.position_id');
         $this->db->where('emppos.`to` IS NULL', FALSE, FALSE)->where('emppos.employee_id', $id);
         return $this->db->get()->row_array();
@@ -197,12 +197,24 @@ class Employee_model extends CI_Model
         if($upload_batch_id)
             $this->db->where('ea.upload_batch', $upload_batch_id);
 
-        $this->db->join('employee_suspensions as es', 'es.employee_id=ea.employee_id');
-        $this->db->where('DATE(es.start_date) >= DATE(ea.datetime_in) AND DATE(es.end_date) <= DATE(ea.datetime_in)');
+        $this->db->where("DATE(ea.datetime_in) >= '{$from}' AND DATE(ea.datetime_in) <= '{$to}'");
+        $this->db->where('ea.datetime_in IS NOT NULL AND ea.datetime_out IS NOT NULL');
+        $employee_attendance_result =  $this->db->get_where('employee_attendance as ea', ['ea.employee_id' => $id])->result_array();
 
-        $this->db->where("DATE(ea.datetime_in) >= '{$from}' AND DATE(ea.datetime_in) <= '{$to}'", FALSE, FALSE);
-        $this->db->where('ea.datetime_in IS NOT NULL AND ea.datetime_out IS NOT NULL', FALSE, FALSE);
-        return $this->db->get_where('employee_attendance as ea', ['ea.employee_id' => $id])->result_array();
+        echo "<pre>";
+        print_r($employee_attendance_result);
+
+        $data = [];
+        foreach ($employee_attendance_result as $key => $value) {
+            $this->db->where("('{$value['datetime_in']}' BETWEEN start_date AND end_date)");
+            $this->db->where('employee_id', $id);
+            $emp_suspension_result = $this->db->get('employee_suspensions')->row_array();
+
+            if(!$emp_suspension_result)
+                array_push($data, $value);
+        }
+
+        return $data;
     }
 
     public function get_filed_requests($id)
@@ -274,6 +286,12 @@ class Employee_model extends CI_Model
     {
         $employee = $this->db->select('id')->get_where($this->table, ['rfid_uid' => $uid])->row_array();
         return $employee ? $this->get($employee['id']) : NULL;
+    }
+
+    public function get_id_by_uid($uid)
+    {
+        $employee = $this->db->select('id')->get_where($this->table, ['rfid_uid' => $uid])->row_array();
+        return $employee ? $employee['id'] : NULL;
     }
 
     public function set_attendance($id, $datetime)

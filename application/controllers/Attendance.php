@@ -84,7 +84,7 @@ class Attendance extends HR_Controller
 			foreach ($emp_result as $attendance) {
 				$name = $this->employee->get_employee_name($attendance['employee_id']);
 				$data[$x]['emp_attendance_id'] = $attendance['id'];
-				$data[$x]['name'] = $name['firstname']." ".$name['middleinitial']." ".$name['lastname'];
+				$data[$x]['name'] = $name['firstname']." ".$name['middleinitial']." ".$name['lastname']." ({$attendance['employee_id']})";
 				$data[$x]['datetime_in'] = ($attendance['datetime_in']) ? date_format(date_create($attendance['datetime_in']), 'Y-m-d h:i A') : NULL;
 				$data[$x]['datetime_out'] = ($attendance['datetime_out']) ? date_format(date_create($attendance['datetime_out']), 'Y-m-d h:i A') : NULL;
 				if($attendance['datetime_out']){
@@ -124,143 +124,112 @@ class Attendance extends HR_Controller
 
 			$this->load->helper('file');
 
+			// convert EOLs to unix (for cross platform compatibility) and strip double quotes
 			$string = str_replace('"', '', $this->dos2unix(file_get_contents('./assets/uploads/'.$file_info['file_name'])));
 
+			// convert string to array using EOL as delimiter
+			$data = explode(PHP_EOL, $string);
 
-			$row = explode(PHP_EOL, $string);
-
-			// echo "<pre>";
-			// var_dump($row);
-			// echo "</pre>";
-			// return;
-
+			// get upload batch
 			$upload_batch_id = $this->employee->get_batch_id();
-			if(!$upload_batch_id)
-				$upload_batch_id = 1;
-
+			if(!$upload_batch_id) $upload_batch_id = 1;
+				
 			$employee_attendance = [];
-			$employee_id = 0;
-			for($index = 6; $index<count($row); $index++){
+			$employee_id = NULL;
 
-				// this may contain the name
-				// $col_val = explode('"', $row[$index]);
+			$start_line = 6;
+			$end_line = count($data);
 
-				// if col val will not contain name then it may contain datetimes
-				$dif_val = explode(",", $row[$index]);
+			$employeeData = [];
+			$currentUid = NULL;
+			$employeeId = NULL;
+			$logs = [];
 
-				if(($dif_val[0] && $dif_val[1])&& !$this->validateDate($dif_val[0])){
-				// if($isset($col_val[1]) && !$this->validateDate($col_val[1])){
+			for($i = $start_line; $i < $end_line ; $i++){
 
-					// print_r($dif_val);
-
-					// this will hold lastname
-					$lastname = trim($dif_val[0]);
-
-					//this will hold first name and MI
-					$temp = explode(" ", $dif_val[1]);
-					$mi_index = count($temp) - 1;
-					unset($temp[$mi_index]);
-
-					$firstname = trim(implode(" ", $temp));
-
-					// unset($name[0]);
-					// $f_m_name = explode(" ", implode(" ", $name));
-					// $firstname = [];
-					// $middleinitial = "";
-					// foreach ($f_m_name as $value) {
-					// 	if($value!="" && $value!=" "){
-					// 		if(strpos($value, ".")===FALSE)
-					// 			array_push($firstname, $value);
-					// 		else
-					// 			if($value!=".")
-					// 				$middleinitial = chop($value, ".");
-					// 	}
-					// }
-					// $firstname = implode(" ", $firstname);
-					// $middleinitial = chop($middleinitial, " ");
-
-					$employee_name = [
-						'firstname' => $firstname,
-						'lastname' => $lastname
-					];
-
-					$res = $this->employee->get_employee($employee_name);
-
-					$employee_id = $res['id'];
-					// echo $employee_id;
-					// print_r($employee_name);
-				}
-				else if($employee_id && isset($dif_val[0]) && $this->validateDate($dif_val[0])){
-					// echo "lol";
-					$attendance = explode(',', $row[$index]);
-
-					$date = explode(" ", str_replace('"', "", $attendance[0]))[0];
-					unset($attendance[0]);
-
-					for($key=1; $key<7; $key+=2){
-						if(!$attendance[$key])
-							$datetime_in = NULL;
-						else
-							$datetime_in = date_format(date_create("{$date} ".str_replace('"', '', $attendance[$key])), 'Y-m-d H:i:s');
+				$uid = NULL;
 
 
-						if(!$attendance[$key+1])
-							$datetime_out = NULL;
-						else
-							$datetime_out = date_format(date_create("{$date} ".str_replace('"', '', $attendance[$key+1])), 'Y-m-d H:i:s');
+				/* Try to match if current cursor contains employee name and id. If it did, get UID enclosed in parenthesis */
+				preg_match('/\((.*?)\)/', $data[$i], $uid);	
+				
+				if($uid){
+					/* Current cursor contained employee name and UID. Extract UID using regex */
+					$currentUid = $uid[1];
+					/* Add salt "CEB-" */
+					$employeeData[$currentUid]['id'] = "CEB-{$uid[1]}";
+					/* Get auto generated id from table using the salted UID */
+					$employeeId = $this->employee->get_id_by_uid($employeeData[$currentUid]['id']);
+				}else{
+					/* This is an empty line or a time log */
 
-						if($datetime_in || $datetime_out){
-							$employee_attendance[] = [
-								'employee_id' => intval($employee_id),
-								'datetime_in' => $datetime_in,
-								'datetime_out' => $datetime_out,
+					/* The UID doesnt match any employee. Proceed to next line  */
+					if(!$employeeId) continue;
+
+					/* This is a time log. Separate each data using comma */
+					$cells = explode(',', $data[$i]);
+
+					/* If the separation yields only one member, its a white space. Proceed to next line */
+					if(count($cells) === 1) continue;
+ 
+					$dateTemplate = explode(' ', $cells[0]);
+					$rawDate = trim($dateTemplate[0]);
+
+					
+					if($this->isValidDate($rawDate)){
+
+						$date = date_create_immutable_from_format('n/j/Y', $rawDate)->format('Y-m-d');
+
+						for($ii = 1; $ii < 7; $ii+=2){
+
+							$temp = ['datetime_in' => NULL, 'datetime_out' => NULL];
+
+							if(is_valid_date($cells[$ii], 'g:i A')){
+								$time = date_create_immutable_from_format('g:i A', $cells[$ii])->format('H:i');
+								$temp['datetime_in'] = "{$date} {$time}";
+							}
+
+							if(is_valid_date($cells[$ii+1], 'g:i A')){
+								$time = date_create_immutable_from_format('g:i A', $cells[$ii+1])->format('H:i');
+								$temp['datetime_out'] = "{$date} {$time}";
+							}
+
+							if(!$temp['datetime_out'] && !$temp['datetime_in']){
+								continue;
+							}
+
+							$employeeData[$currentUid]['logs'][] = $temp;
+
+							$logs[] = [
+								'employee_id' => $employeeId,
+								'datetime_in' => $temp['datetime_in'],
+								'datetime_out' => $temp['datetime_out'],
 								'upload_batch' => $upload_batch_id,
-								'created_by' => $this->session->userdata('id'),
-								'last_updated_by' => $this->session->userdata('id'),
-								'last_approved_by' => $this->session->userdata('id')
+								'created_by' => user_id(),
+								'last_updated_by' => user_id(),
+								'last_approved_by' => user_id()
 							];
+							
 						}
+
 					}
+					
 				}
+				
 			}
 
 			unlink('./assets/uploads/'.$file_info['file_name']);
 
-			// echo "<pre>";
-			// var_dump($employee_attendance);
-			// echo "</pre>";
-			// return;
+			$this->employee->insert_attendance($logs);
 
-			if(!empty($employee_attendance)){
-				if(count($employee_attendance)>20){
-					$arr_chunk = array_chunk($employee_attendance, count($employee_attendance)/20);
-					foreach ($arr_chunk as $key => $value) {
-						if($this->employee->insert_attendance($value, "BATCH"))
-							$this->session->set_flashdata('upload_status', 1);
-						else
-							$this->session->set_flashdata('upload_status', 0);
-					}
-				}
-				else{
-					if($this->employee->insert_attendance($employee_attendance, "BATCH"))
-						$this->session->set_flashdata('upload_status', 1);
-					else
-						$this->session->set_flashdata('upload_status', 0);
-				}
-			}
-			else
-				$this->session->set_flashdata('upload_status', 2);
-
-			
 			redirect('attendance/view');
 		}
 	}
 
-	public function validateDate($date)
+	public function isValidDate($date)
 	{
-		$date = explode(" ", $date);
-	    $d = DateTime::createFromFormat('n/j/Y', $date[0]);
-	    return $d && $d->format('n/j/Y') === $date[0];
+	    $d = DateTime::createFromFormat('n/j/Y', $date);
+	    return $d && $d->format('n/j/Y') === $date;
 	}
 
 	public function authorize_changes()

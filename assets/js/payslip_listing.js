@@ -3,7 +3,7 @@
 		$('.search_employee').select2();
 
 		$('#search_employee').on('click', function(){
-			$.post($(this).data('url'), {employee_id: $('.search_employee').val()})
+			$.post($(this).data('url'), {employee_id: $('.search_employee').val(), batch_id: $(this).data('batch')})
 			.done(function(response){
 				$('#table_body').html(response);
 			})
@@ -30,15 +30,14 @@
 
 		$('#print_button').on('click', function(){
 			var wndw = window.open();
-			$(this).data('url')+"/"+$('#batch_id').val();
 
-			$.post($(this).data('url')+"/"+$('#batch_id').val())
+			$.post($(this).data('url'))
 			.done(function(response){
 				wndw.document.write(response);
-				/*wndw.document.close();
+				wndw.document.close();
 				wndw.focus();
 				wndw.print();
-				wndw.close();*/
+				wndw.close();
 			});
 		})
 	})

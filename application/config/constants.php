@@ -103,6 +103,9 @@ define('NAV_REPORTS', 'employee_reports');
 define('NAV_SUSPENSIONS', 'employee_suspensions');
 define('NAV_BONUSES', 'bonus');
 
+define('SUBNAV_LISTING', 'payslip_listing');
+define('SUBNAV_MANUAL', 'payslip_manual');
+define('SUBNAV_GENERATE', 'payslip_generate');
 define('SUBNAV_EMPLOYEES', 'employee');
 define('SUBNAV_DEPARTMENTS', 'department');
 define('SUBNAV_POSITIONS', 'positions');

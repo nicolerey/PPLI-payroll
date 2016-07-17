@@ -48,8 +48,23 @@
                 <a href="<?= "{$url}pay_modifiers" ?>"><i class="fa fa-cubes"></i> <span>Pay Particulars</span></a>
             </li>
 
-            <li class="<?= $active_nav === NAV_MY_PAYSLIP ? 'active' : '' ?>">
-                <a href="<?= "{$url}my_payslip" ?>"><i class="fa fa-sticky-note"></i> <span> Payslips</span></a>
+            <li class="treeview <?= $active_nav === NAV_MY_PAYSLIP ? 'active' : '' ?>">
+              <a href="#">
+                <i class="fa fa-sticky-note"></i>
+                <span> Payslips</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li class="<?= $active_subnav === SUBNAV_LISTING ? 'active' : '' ?>">
+                    <a href="<?= "{$url}my_payslip" ?>"><i class="fa fa-circle-o"></i> Listing</a>
+                </li>
+                <li class="<?= $active_subnav === SUBNAV_MANUAL ? 'active' : '' ?>">
+                    <a href="#<?php //"{$url}my_payslip/create_manual_payslip"; ?>"><i class="fa fa-circle-o"></i> Create manual payslip</a>
+                </li>
+                <li class="<?= $active_subnav === SUBNAV_GENERATE ? 'active' : '' ?>">
+                    <a href="<?= "{$url}payslip" ?>"><i class="fa fa-circle-o"></i> Generate payslip</a>
+                </li>
+              </ul>
             </li>
 
             <li class="<?= $active_nav === NAV_VIEW_ATTENDANCE? 'active' : '' ?>">

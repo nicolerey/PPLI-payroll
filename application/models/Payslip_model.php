@@ -13,6 +13,7 @@ class Payslip_model extends CI_Model
 		$position = $this->position->get($employee_data['position_id']);
 
 		$upload_batch_id = $this->employee->get_batch_id();
+
 		$attendance = $this->employee->get_attendance($employee_id, $from, $to, $upload_batch_id-1);
 		if(!$attendance){
 			return [];
@@ -424,6 +425,12 @@ class Payslip_model extends CI_Model
 		return $data;
 	}
 
+	public function get_batches()
+	{
+		$this->db->select('DISTINCT(batch_id), start_date, end_date');
+		return $this->db->get($this->table)->result_array();
+	}
+
 	public function all($employee_id = FALSE, $condition = FALSE)
 	{
 		$this->db->select('p.start_date, p.batch_id, p.approval_status, p.end_date, p.id, e.firstname, e.middleinitial, e.lastname')->from('payroll AS p')->join('employees AS e', 'p.employee_id = e.id');
@@ -433,7 +440,9 @@ class Payslip_model extends CI_Model
 		if($condition)
 			$this->db->where($condition);
 		$this->db->order_by('end_date', 'DESC');
-		return $this->db->get()->result_array();
+		$a = $this->db->get()->result_array();
+		//print_r($this->db->last_query());
+		return $a;
 	}
 
 	public function adjust($id, $amount)

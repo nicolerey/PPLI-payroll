@@ -2,8 +2,9 @@
 
 class My_payslip extends HR_Controller
 {
-	protected $tab_title = 'View my payslip';
+	protected $tab_title = 'View payslip';
 	protected $active_nav = NAV_MY_PAYSLIP;
+	protected $active_subnav;
 
 	public function __construct()
 	{
@@ -13,20 +14,65 @@ class My_payslip extends HR_Controller
 
 	public function index()
 	{
+		$active_subnav = SUBNAV_LISTING;
+
+		$this->generate_page('my-payslip/batch_select', [
+			'batches' => $this->payslip->get_batches()
+		]);
+	}
+
+	public function view_payslip($batch_id)
+	{
 		$this->load->model(['Employee_model' => 'employee']);
-		$current_date = date('Y-m-d');
-		$previous_date = date_format(date_sub(date_create($current_date), date_interval_create_from_date_string("1 month")), 'Y-m-d');
 
 		$this->import_page_script(['payslip_listing.js', 'jquery.printPage.js', 'select2.min.js']);
 		$this->generate_page('my-payslip/listing', [
-			'items' => $this->payslip->all(FALSE, "DATE(end_date) >= '{$previous_date}' AND DATE(end_date) <= '{$current_date}'"),
-			'employee' => $this->employee->all()
+			'items' => $this->payslip->all(FALSE, "batch_id = {$batch_id}"),
+			'employee' => $this->employee->all(),
+			'batch_id' => $batch_id
 		]);
+	}
+
+	public function create_manual_payslip()
+	{
+		$this->load->model(['Employee_model' => 'employee']);
+		
+		$employee = $this->employee->all();
+
+		$this->import_plugin_script(['price-format.js', 'bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
+		$this->import_page_script('manual-payslip.js');
+
+		$this->generate_page('my-payslip/manual_payslip_view', [
+			'employee_data' => $employee
+		]);
+	}
+
+	public function select_employee()
+	{
+		$this->output->set_content_type('json');
+
+		$this->load->model(['Employee_model' => 'employee', 'Position_model' => 'position', 'Pay_modifier_model' => 'pay_modifier']);
+
+		$input = $this->input->post();
+
+		$emp_position = $this->employee->get_position($input['id']);
+		$position = $this->position->get($emp_position['id']);
+
+		$pm_flag = ($this->session->userdata('account_type')=='pm')?TRUE:FALSE;
+
+		$data = [
+			'basic_rate' => $emp_position['daily_rate'],
+			'overtime_rate' => $emp_position['overtime_rate'],
+			'late_penalty_rate' => $emp_position['late_penalty'],
+			'emp_particulars' => $position['particulars'],
+			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)
+		];
+
+		$this->load->view('my-payslip/manual_payslip_blueprint', $data);
 	}
 
 	public function view($id)
 	{
-
 		$this->load->model(['Employee_model' => 'employee', 'Pay_modifier_model' => 'pay_modifier']);
 		
 		$payslip = $this->payslip->get_by_employee($id);
@@ -92,19 +138,10 @@ class My_payslip extends HR_Controller
 				$result = $this->payslip->update_payroll_batch_normal($data, "NORMAL");
 			}
 
-			if($result){
-				$this->output->set_output(json_encode([
-					'result' => TRUE
-				]));
-				return;
-			}
-			else{
-				$this->output->set_output(json_encode([
-					'result' => FALSE,
-					'messages' => ['An error occured.']
-				]));
-				return;
-			}
+			$this->output->set_output(json_encode([
+				'result' => TRUE
+			]));
+			return;
 		}
 
 		$this->output->set_output(json_encode([

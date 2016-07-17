@@ -9,27 +9,6 @@
   <!-- Default box -->
   <div class="box box-solid">
       <div class="box-body">
-
-        <?php if(is_numeric($num = $this->session->flashdata('upload_status'))):?>
-          <div class="alert<?= ($num==1)?' alert-success':' alert-danger';?>">
-            <ul class="list-unstyled">
-              <?php if($num==1):?>
-                <li>File upload was successful.</li>
-              <?php elseif($num==2):?>
-                <li>No changes to attendance.</li>
-              <?php else:?>
-                <li>File upload was unsuccessful.</li>
-              <?php endif;?>
-            </ul>
-          </div>
-        <?php endif;?>
-        <?php if($this->session->flashdata('save_status')===true):?>
-          <div class="alert alert-success" role="alert" id="success_alert">Changes successfully saved.</div>
-        <?php elseif($this->session->flashdata('save_status')===false):?>
-          <div class="alert alert-danger" role="alert" id="fail_alert">Error in saving changes.</div>
-        <?php endif;?>
-        <div class="alert alert-danger authorization_fail" role="alert" id="fail_alert">Authorization failed.</div>
-
         <div class="form-group">
           <form class="form-inline" method="GET" action="<?= current_url()?>">
             <?php if(isset($search_employee)):?>
