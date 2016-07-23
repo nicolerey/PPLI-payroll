@@ -59,7 +59,7 @@
                     <a href="<?= "{$url}my_payslip" ?>"><i class="fa fa-circle-o"></i> Listing</a>
                 </li>
                 <li class="<?= $active_subnav === SUBNAV_MANUAL ? 'active' : '' ?>">
-                    <a href="#<?php //"{$url}my_payslip/create_manual_payslip"; ?>"><i class="fa fa-circle-o"></i> Create manual payslip</a>
+                    <a href='<?= "{$url}my_payslip/create_manual_payslip"; ?>'><i class="fa fa-circle-o"></i> Create manual payslip</a>
                 </li>
                 <li class="<?= $active_subnav === SUBNAV_GENERATE ? 'active' : '' ?>">
                     <a href="<?= "{$url}payslip" ?>"><i class="fa fa-circle-o"></i> Generate payslip</a>

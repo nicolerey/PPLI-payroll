@@ -4,13 +4,13 @@
         <table class="table table-hover table-striped">
         <thead>
             <tr>
-            <th class="col-sm-1"></th>
-            <th class="col-sm-3">Particulars</th>
-            <th class="col-sm-2">Rate type</th>
-            <th class="col-sm-2">Rate</th>
-            <th class="col-sm-1">No. of days</th>
-            <th class="col-sm-1">No. of hours</th>
-            <th class="col-sm-2">Amount</th>
+                <th class="col-sm-1"></th>
+                <th class="col-sm-3">Particulars</th>
+                <th class="col-sm-2">Rate type</th>
+                <th class="col-sm-2">Rate</th>
+                <th></th>
+                <th></th>
+                <th class="col-sm-2">Amount</th>
             </tr>
         </thead>
         <tbody class="additional_particulars_container">
@@ -19,12 +19,12 @@
                 <td>Basic Rate</td>
                 <td>Daily</td>
                 <td class="basic_rate">
-                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 1);" value="<?= $basic_rate;?>"/>
+                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $basic_rate?$basic_rate:0.00;?>"/>
                 </td>
-                <td class="particular_days_rendered">
-                    <input type="number" class="form-control days_rendered" name="days_rendered" value="0"/>    
+                <td>
+                    <input type="number" class="form-control days_rendered" name="days_rendered" onchange="change_days(this)" value="0" min="0" />
                 </td>
-                <td class="hours_rendered">-</td>
+                <td style="padding-right: 50px;">day/s</td>
                 <td class="particular_amount">
                     0.00
                 </td>
@@ -33,41 +33,34 @@
                 <td></td>
                 <td>Overtime</td>
                 <td>Daily</td>
-                <td>
-                    -
-                    <input type="text" class="hidden particular_rate" value="<?= $basic_rate * ($overtime_rate/100);?>" name="overtime_rate"/>
+                <td class="overtime_rate">
+                    <?= number_format($basic_rate * ($overtime_rate/100), 2);?>
                 </td>
-                <td>-</td>
                 <td>
-                    <input type="text" onkeypress="return isNumberKey(event)" name="overtime_time"/>
+                    <input type="number" min="0" step="0.01" class="form-control overtime_time" name="overtime_time" value="0.00" onchange="calculate_overtime_amount()" />
                 </td>
-                <td class="particular_amount">
+                <td>hour/s</td>
+                <td class="overtime_amount">
                     0.00
                 </td>
             </tr>
             <?php foreach($emp_particulars as $emp_part):?>
                 <?php if($emp_part['type']=='a'):?>
-                    <?php
-                        if($emp_part['particular_type']=='d')
-                            $add_type = "Daily";
-                        else
-                            $add_type = "Monthly";
-                    ?>
                     <tr>
                         <td></td>
                         <td>
                             <?= $emp_part['name'];?>
                             <input type="hidden" name="particular_id[]" value="<?= $emp_part['id']?>"/>
                         </td>
-                        <td><?= $add_type;?></td>
+                        <td><?= ($emp_part['particular_type']=='d')?'Daily':'Monthly';?></td>
                         <td>
-                            <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 1);" value="<?= $emp_part['amount'];?>"/>
-                        </td>
-                        <td class="particular_days_rendered">
-                            <input type="number" class="form-control days_rendered" name="days_rendered" value="0"/>
+                            <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $emp_part['amount'];?>"/>
                         </td>
                         <td>
-
+                            <input type="number" class="form-control days_rendered" onchange="change_days(this)" value="0" min="0"/>
+                        </td>
+                        <td>
+                            day/s
                         </td>
                         <td class="particular_amount">
                             0.00
@@ -78,28 +71,29 @@
             <tr class="dynamic_add_particulars hidden particular_group">
                 <td>
                     <button type="button" class="btn btn-flat btn-danger" onclick="delete_particular_group(this);">
-                    <span class="glyphicon glyphicon-remove"></span>
+                        <span class="glyphicon glyphicon-remove"></span>
                     </button>
                 </td>
                 <td>
                     <select class="form-control additional_name" onchange="change_particular_type(this);">
-                    <option value=""></option>
-                    <?php if(!empty($particulars)):?>
-                        <?php foreach($particulars as $particular):?>
-                        <?php if($particular['type']==='a'):?>
-                            <option value="<?= $particular['id'];?>" rate_type="<?= $particular['particular_type'];?>"><?= $particular['name'];?></option>
+                        <option value=""></option>
+                        <?php if(!empty($particulars)):?>
+                            <?php foreach($particulars as $particular):?>
+                            <?php if($particular['type']==='a'):?>
+                                <option value="<?= $particular['id'];?>" rate_type="<?= $particular['particular_type'];?>"><?= $particular['name'];?></option>
+                            <?php endif;?>
+                            <?php endforeach;?>
                         <?php endif;?>
-                        <?php endforeach;?>
-                    <?php endif;?>
                     </select>
                 </td>
                 <td class="particular_rate_type">-</td>
                 <td>
-                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 1);"/>
+                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate"/>
                 </td>
                 <td>
-                    <input type="number" class="form-control particular_days_rendered" name="" value="0" onchange="calculate_particular_amount(this, 1);"/>
+                    <input type="number" class="form-control days_rendered" name="" value="0" onchange="change_days(this, 1);" min="0"/>
                 </td>
+                <td style="padding-right: 50px;">day/s</td>
                 <td class="particular_amount">
                     0.00
                 </td>
@@ -130,55 +124,57 @@
     </div>
     <div class="row">
     <div class="row">
-        <label class="col-sm-7 control-label text-danger"> Deductions:</label>
+        <label class="col-sm-5 control-label text-danger"> Deductions:</label>
     </div>
     <div class="row">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-5">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-7">
         <table class="table table-hover table-striped text-danger">
             <thead>
-            <tr>
-                <th class="col-sm-1"></th>
-                <th class="col-sm-5">Particulars</th>
-                <th class="col-sm-2">Rate type</th>
-                <th class="col-sm-2">
-                <th class="col-sm-3">Amount</th>
-            </tr>
+                <tr>
+                    <th class="col-sm-1"></th>
+                    <th class="col-sm-3">Particulars</th>
+                    <th class="col-sm-2">Rate type</th>
+                    <th></th>
+                    <th></th>
+                    <th class="col-sm-2">Amount</th>
+                </tr>
             </thead>
             <tbody class="deduction_particulars_container">
-            <?php if($payslip['particulars']['deductions']):?>
-                <?php foreach($payslip['particulars']['deductions'] as $key=>$deductions):?>
-                <?php if($key!=='loan'):?>
-                    <?php
-                    if($deductions['type']=='d')
-                        $ded_type = "Daily";
-                    else
-                        $ded_type = "Monthly";
-                    ?>
-                    <tr>
+                <tr>
                     <td></td>
-                    <td><?= $deductions['name'];?></td>
-                    <td><?= $ded_type;?></td>
+                    <td>Late penalties</td>
+                    <td>-</td>
                     <td>
-                        <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
-                        <?php if($key!=='loan'):?>
-                        <input type="hidden" name="particular_id[]" value="<?= $deductions['id']?>"/>
-                        <?php endif;?>
+                        <input type="number" class="form-control late_minutes" name="late_minutes" step="0.01" min="0" value="0.00" onchange="calculate_late_amount()" />
                     </td>
-                    </tr>
-                <?php endif;?>
-                <?php if($key==='loan'):?>
-                    <?php foreach($deductions as $loan):?>
-                    <tr>
-                        <td></td>
-                        <td>Loan Payment - <?= $loan['payment_date'];?></td>
-                        <td>-</td>
-                        <td class="loan_payment_amount"><?= $loan['payment_amount'];?></td>
-                    </tr>
-                    <?php endforeach;?>
-                <?php endif;?>
+                    <td style="padding-right: 50px;">
+                        min/s
+                        <input type="text" class="hidden late_rate" value="<?= number_format($late_penalty_rate, 2);?>" />
+                    </td>
+                    <td class="late_amount">
+                        0.00
+                    </td>
+                </tr>
+                <?php foreach($emp_particulars as $emp_part):?>
+                    <?php if($emp_part['type']=='d'):?>
+                        <tr>
+                            <td></td>
+                            <td><?= $emp_part['name'];?></td>
+                            <td><?= ($emp_part['particular_type']=='d')?'Monthly':'Daily';?></td>
+                            <td>
+                                <input type="number" class="form-control days_rendered" onchange="change_days(this)" value="0" min="0"/>
+                            </td>
+                            <td style="padding-right: 50px;">
+                                day/s
+                            </td>
+                            <td>
+                                <input  min="0" step="0.01" value="<?= $emp_part['amount'];?>" class="form-control pformat deduction_particular_amount" name="particular_rate[]"/>
+                                <input type="hidden" name="particular_id[]" value="<?= $emp_part['id']?>"/>
+                            </td>
+                        </tr>
+                    <?php endif;?>
                 <?php endforeach;?>
-            <?php endif;?>
             <tr class="dynamic_ded_particulars hidden particular_group">
                 <td>
                 <button type="button" class="btn btn-flat btn-danger" onclick="delete_particular_group(this);">
@@ -199,7 +195,13 @@
                 </td>
                 <td class="particular_rate_type">-</td>
                 <td>
-                <input name=""  min="0" step="0.01" value="0" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"/>
+                    <input type="number" class="form-control days_rendered" onchange="change_days(this)" value="0" min="0"/>
+                </td>
+                <td style="padding-right: 50px;">
+                    day/s
+                </td>
+                <td>
+                <input name=""  min="0" step="0.01" value="0" class="form-control pformat deduction_particular_amount"/>
                 </td>
             </tr>
             </tbody>
@@ -219,7 +221,7 @@
             </thead>
             <tbody>
             <tr>
-                <td style="text-align: right;"><label class="coltrol-label" style="margin-bottom: 0;"> Net Pay:</label></td><td class="net_pay">2400.00</td>
+                <td style="text-align: right;"><label class="coltrol-label" style="margin-bottom: 0;"> Net Pay:</label></td><td class="net_pay">0.00</td>
             </tr>
             </tbody>
         </table>
@@ -227,3 +229,9 @@
     </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.pformat').priceFormat({prefix:''});
+    });
+</script>

@@ -1,32 +1,63 @@
-function calculate_particular_amount(element, type){
+function change_days(element){
+	$('.days_rendered').each(function(){
+		$(this).val($(element).val());
+	});
+
+	calculate_particular_amount();
+}
+
+function cha(element){
 	var particular_rate = 0;
 	var particular_days_rendered = 0;
-	var particular_unit = 0;
+	var particular_unit = 0
 
-	particular_rate = $(element).parent().parent().find('.particular_rate').val().replace(",", "");
-	if(type){
-		particular_days_rendered = $(element).parent().parent().find('.particular_days_rendered').val();
-		particular_unit = $(element).parent().parent().find('.particular_unit').val();
-	}
-	else{
-		particular_days_rendered = $(element).parent().parent().find('.particular_days_rendered').html();
-		particular_unit = $(element).parent().parent().find('.particular_unit').val();
-	}
+	particular_rate = $(element).val();
+	particular_days_rendered = $('.days_rendered').val();
 
-	var particular_amount = particular_rate * particular_days_rendered * particular_unit;
+	console.log(particular_rate);
+	console.log(particular_days_rendered);
+
+	var particular_amount = (particular_rate * 10) * particular_days_rendered;
 	$(element).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
 
 	calculate_total_amount();
 }
 
-function isNumberKey(evt)
-{
-    var charCode = (evt.which) ? evt.which : evt.keyCode;
-    if (charCode != 46 && charCode > 31 
-    && (charCode < 48 || charCode > 57))
-        return false;
+function calculate_particular_amount(element){
 
-    return true;
+	var particular_rate = [];
+	$('.particular_rate').each(function(index, value){
+		particular_rate.push(Number(($(this).val()).replace(",", "")));
+	});
+
+	var days_rendered = $('.days_rendered').val();
+
+	$('.particular_amount').each(function(index, value){
+		var tot = Number(particular_rate[index]) * Number(days_rendered);
+		$(this).html(commaSeparateNumber(tot.toFixed(2)))
+	});
+
+	calculate_total_amount();
+}
+
+function calculate_late_amount(){
+	var late_minutes = Number(($('.late_minutes').val()).replace(",", ""));
+	var late_rate = Number(($('.late_rate').val()).replace(",", ""));
+
+	var tot = late_minutes * late_rate;
+	$('.late_amount').html(commaSeparateNumber(tot.toFixed(2)));
+
+	calculate_total_amount();
+}
+
+function calculate_overtime_amount(){
+	var overtime_hours = $('.overtime_time').val();
+	var overtime_rate = Number(($('.overtime_rate').html()).replace(",", ""));
+
+	var tot = overtime_hours * overtime_rate;
+	$('.overtime_amount').html(commaSeparateNumber(tot.toFixed(2)));
+
+	calculate_total_amount();
 }
 
 function calculate_total_amount(){
@@ -34,6 +65,7 @@ function calculate_total_amount(){
 	$('.particular_amount').each(function(){
 		total_additional_amount += Number(($(this).html()).replace(",", ""));
 	});
+	total_additional_amount += Number(($('.overtime_amount').html()).replace(",", ""));
 
 	var total_deduction_amount = 0;
 	$('.deduction_particular_amount').each(function(){
@@ -42,6 +74,7 @@ function calculate_total_amount(){
 	$('.loan_payment_amount').each(function(){
 		total_deduction_amount += Number(($(this).html()).replace(",", ""));
 	});
+	total_deduction_amount += Number(($('.late_amount').html()).replace(",", ""));
 
 	var net_pay = total_additional_amount - total_deduction_amount;
 
@@ -107,36 +140,33 @@ function select_employee(element){
         $('#payslip_forms').html('');
 }
 
+$(document).on('keyup', '.particular_rate', function(){
+	var particular_rate = 0;
+	var particular_days_rendered = 0;
+	var particular_unit = 0
+
+	particular_rate = $(this).val();
+	particular_days_rendered = $('.days_rendered').val();
+
+	console.log(particular_rate);
+	console.log(particular_days_rendered);
+
+	var particular_amount = particular_rate * particular_days_rendered;
+	$(this).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
+
+	calculate_total_amount();
+});
+
+$(document).on('keyup', '.deduction_particular_amount', function(){
+	calculate_total_amount();
+});
+
 $(document).ready(function(){
     $('.datepicker').datepicker();
 
-	calculate_total_amount();
-
-	$('.pformat').priceFormat({prefix:''});
-	
-	$('#approve_button').on('click', function(){
-		var btn = $(this);
-		var msgBox = $('.alert-danger').addClass('hidden');
-
-		$.post($(this).data('action'), {id: $(this).data('pk')})
-		.done(function(response){
-			if(response.result){
-				$('.approval_status').text('Approved');
-				btn.hide();
-
-				return;
-			}
-
-			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
-			$('html, body').animate({scrollTop: 0}, 'slow');
-		})
-		.fail(function(){
-			alert('An internal server error has occured');
-		});
-	});
-
 	$('form').submit(function(e){
 		e.preventDefault();
+
 		var that = $(this),
 			submitBtn = that.find('[type=submit]'),
 			msgBox = $('.alert-danger');
@@ -145,16 +175,16 @@ $(document).ready(function(){
 		
 		$.post(that.data('action'), that.serialize())
 		.done(function(response){
-			var resp = jQuery.parseJSON(response);
-			if(resp.result){
+			/*if(response.result){
 				window.location.href = $('.cancel').attr('href');
 				return;
 			}
-			msgBox.removeClass('hidden').find('ul').html('<li>'+resp.messages.join('</li><li>')+'</li>');
-			$('html, body').animate({scrollTop: 0}, 'slow');
+
+			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
+			$('html, body').animate({scrollTop: 0}, 'slow');*/
 		})
 		.fail(function(){
 			alert('An internal error has occured. Please try again.');
 		});
-	})
+	});
 })

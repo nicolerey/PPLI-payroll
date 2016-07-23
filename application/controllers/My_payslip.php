@@ -49,8 +49,6 @@ class My_payslip extends HR_Controller
 
 	public function select_employee()
 	{
-		$this->output->set_content_type('json');
-
 		$this->load->model(['Employee_model' => 'employee', 'Position_model' => 'position', 'Pay_modifier_model' => 'pay_modifier']);
 
 		$input = $this->input->post();
@@ -59,6 +57,13 @@ class My_payslip extends HR_Controller
 		$position = $this->position->get($emp_position['id']);
 
 		$pm_flag = ($this->session->userdata('account_type')=='pm')?TRUE:FALSE;
+
+		$emp_particulars = [];
+		if($position['particulars']){
+			foreach ($position['particulars'] as $key => $value) {
+				array_push($emp_particulars, $value['particulars_id']);
+			}
+		}
 
 		$data = [
 			'basic_rate' => $emp_position['daily_rate'],
@@ -103,6 +108,98 @@ class My_payslip extends HR_Controller
 		$input = $this->input->post();
 		$items = $this->payslip->all(FALSE, $input);
 		$this->load->view('my-payslip/listing_prototype', ['items' => $items]);
+	}
+
+	public function store_manual_payslip()
+	{
+		$this->output->set_content_type('json');
+
+		$this->load->model(['Employee_model' => 'employee']);
+
+		$this->_perform_validation();
+		if(!$this->form_validation->run()){
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => array_values($this->form_validation->error_array())
+			]));
+			return;
+		}
+
+		$input = $this->input->post();
+
+		$emp_position = $this->employee->get_position($input['emp_id']);
+
+		$batch_id = $this->payslip->get_last_batch_id();
+		$ad_flag = ($this->session->userdata('account_type')=='ad')?1:0;
+		$payroll_data = [
+			'employee_id' => $input['emp_id'],
+			'start_date' => date_format(date_create($input['start_date']), 'Y-m-d'),
+			'end_date' => date_format(date_create($input['end_date']), 'Y-m-d'),
+			'days_rendered' => $input['days_rendered'],
+			'overtime_hours_rendered' => $input['overtime_time'],
+			'late_minutes' => $input['late_minutes'],
+			'current_daily_wage' => $emp_position['daily_rate']?$emp_position['daily_rate']:0,
+			'daily_wage_units' => 1,
+			'current_late_penalty' => $emp_position['late_penalty']?$emp_position['late_penalty']:0,
+			'overtime_pay' => $emp_position['overtime_rate']?$emp_position['overtime_rate']:0,
+			'batch_id' => $batch_id['batch_id'] + 1,
+			'approval_status' => $ad_flag,
+			'approved_by' => ($ad_flag)?$this->session->userdata('id'):NULL,
+			'created_by' => $this->session->userdata('id')
+		];
+
+		$payroll_particulars_data = [];
+		if(isset($input['additional_name'])){
+			foreach ($input['additional_name'] as $key => $value) {
+				$payroll_particulars_data[] = [
+					'particulars_id' => $value,
+					'units' => 1,
+					'amount' => $input['additional_particular_rate'][$key]
+				];
+			}
+		}
+		if(isset($input['deduction_name'])){
+			foreach ($input['deduction_name'] as $key => $value) {
+				$payroll_particulars_data[] = [
+					'particulars_id' => $value,
+					'units' => 1,
+					'amount' => $input['deduction_particular_rate'][$key]
+				];
+			}
+		}
+
+		if($this->payslip->create_manual_payslip($payroll_data, $payroll_particulars_data)){
+			$this->output->set_output(json_encode([
+				'result' => TRUE,
+				'messages' => []
+			]));
+			return;
+		}
+
+		$this->output->set_output(json_encode([
+			'result' => FALSE,
+			'messages' => ['Cannot add payslip. Please try again later.']
+		]));
+		return;
+	}
+
+	public function _perform_validation()
+	{
+		$this->form_validation->set_rules('emp_id', 'employee', 'required');
+		$this->form_validation->set_rules('start_date', 'start date', 'required');
+		$this->form_validation->set_rules('end_date', 'end date', 'required');
+
+		$input = $this->input->post();
+
+		if(isset($input['additional_name'])){
+			$this->form_validation->set_rules('additional_name[]', 'particular name', 'required');
+			$this->form_validation->set_rules('additional_name[]', 'particular rate', 'required');
+		}
+
+		if(isset($input['deduction_name'])){
+			$this->form_validation->set_rules('deduction_name[]', 'particular name', 'required');
+			$this->form_validation->set_rules('deduction_particular_rate[]', 'particular rate', 'required');
+		}
 	}
 
 	public function approve_payslip()

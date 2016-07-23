@@ -33,7 +33,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label"> Employee name</label>
           <div class="col-sm-3">
-            <select class="form-control" onchange="select_employee(this)" data-url="<?= base_url('my_payslip/select_employee');?>">
+            <select class="form-control" name="emp_id" onchange="select_employee(this)" data-url="<?= base_url('my_payslip/select_employee');?>">
                 <option value=""></option>
                 <?php foreach($employee_data as $emp):?>
                     <option value="<?= $emp['id'];?>"><?= "{$emp['lastname']}, {$emp['firstname']} {$emp['middleinitial']}"?></option>

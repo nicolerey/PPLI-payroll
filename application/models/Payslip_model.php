@@ -385,6 +385,26 @@ class Payslip_model extends CI_Model
 		return $this->db->trans_status();
 	}
 
+	public function create_manual_payslip($payroll_data, $payroll_particulars_data)
+	{
+		if($this->db->insert($this->table, $payroll_data)){
+
+			$id = $this->db->insert_id();
+			foreach ($payroll_particulars_data as $key => $value) {
+				$payroll_particulars_data[$key]['payroll_id'] = $id;
+			}
+
+			if(!empty($payroll_particulars_data) && $this->db->insert_batch('payroll_particulars', $payroll_particulars_data))
+				return true;
+			else if(empty($payroll_particulars_data))
+				return true;
+
+			return false;
+		}
+
+		return false;
+	}
+
 	public function check($employee_id, $from, $to)
 	{
 		$this->db->select('id')->from('payroll')->where([

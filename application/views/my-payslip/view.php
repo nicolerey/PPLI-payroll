@@ -63,7 +63,8 @@
                   <th class="col-sm-3">Particulars</th>
                   <th class="col-sm-2">Rate type</th>
                   <th class="col-sm-2">Rate</th>
-                  <th class="col-sm-1">No. of days</th>
+                  <th></th>
+                  <th></th>
                   <th class="col-sm-2">Amount</th>
                 </tr>
               </thead>
@@ -73,9 +74,10 @@
                   <td>Basic Rate</td>
                   <td>Daily</td>
                   <td class="basic_rate">
-                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 0);" value="<?= $payslip['current_daily_wage'];?>"/>
+                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $payslip['current_daily_wage'];?>"/>
                   </td>
                   <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
+                  <td style="padding-right: 50px;">day/s</td>
                   <td class="particular_amount">
                     <?= number_format($payslip['current_daily_wage'] * $payslip['days_rendered'] * $payslip['daily_wage_units'], 2);?>
                   </td>
@@ -84,8 +86,9 @@
                   <td></td>
                   <td>Overtime</td>
                   <td>Daily</td>
-                  <td>-</td>
-                  <td>-</td>
+                  <td><?= number_format($payslip['current_daily_wage'] * ($payslip['overtime_pay']/100), 2);?></td>
+                  <td><?= number_format($payslip['overtime_hours_rendered'], 2);?></td>
+                  <td>hour/s</td>
                   <td class="particular_amount"><?= number_format($payslip['overtime_pay'] * $payslip['overtime_hours_rendered'], 2);?></td>
                 </tr>
                 <?php if($payslip['particulars']['additionals']):?>
@@ -104,9 +107,12 @@
                       </td>
                       <td><?= $add_type;?></td>
                       <td>
-                        <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 0);" value="<?= $additionals['amount'];?>"/>
+                        <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $additionals['amount'];?>"/>
                       </td>
                       <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
+                      <td>
+                        day/s
+                      </td>
                       <td class="particular_amount">
                         <?= number_format($additionals['amount'] * $payslip['days_rendered'] * $additionals['units'], 2);?>
                       </td>
@@ -133,10 +139,13 @@
                   </td>
                   <td class="particular_rate_type">-</td>
                   <td>
-                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate" onchange="calculate_particular_amount(this, 1);"/>
+                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate" onkeyup="cha(this);" />
                   </td>
                   <td>
-                    <input type="number" class="form-control particular_days_rendered" name="" value="0" onchange="calculate_particular_amount(this, 1);"/>
+                    <?= $payslip['days_rendered'];?>
+                  </td>
+                  <td>
+                    day/s
                   </td>
                   <td class="particular_amount">
                     0.00
@@ -171,15 +180,17 @@
             <label class="col-sm-7 control-label text-danger"> Deductions:</label>
           </div>
           <div class="row">
-            <div class="col-sm-6"></div>
-            <div class="col-sm-5">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-7">
               <table class="table table-hover table-striped text-danger">
                 <thead>
                   <tr>
                     <th class="col-sm-1"></th>
-                    <th class="col-sm-5">Particulars</th>
-                    <th class="2">Rate type</th>
-                    <th class="col-sm-3">Amount</th>
+                    <th class="col-sm-3">Particulars</th>
+                    <th class="col-sm-2">Rate type</th>
+                    <th></th>
+                    <th></th>
+                    <th class="col-sm-2">Amount</th>
                   </tr>
                 </thead>
                 <tbody class="deduction_particulars_container">
@@ -187,6 +198,8 @@
                     <td></td>
                     <td>Late penalties</td>
                     <td>-</td>
+                    <td><?= number_format($payslip['late_minutes'], 2);?></td>
+                    <td style="padding-right: 50px;">min/s</td>
                     <td class="late_penalty">
                       <?= number_format($payslip['current_late_penalty'] * $payslip['late_minutes'], 2);?>
                     </td>
@@ -204,8 +217,10 @@
                           <td></td>
                           <td><?= $deductions['name'];?></td>
                           <td><?= $ded_type;?></td>
+                          <td><?= $payslip['days_rendered'];?></td>
+                          <td>day/s</td>
                           <td>
-                            <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
+                            <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
                             <?php if($key!=='loan'):?>
                               <input type="hidden" name="particular_id[]" value="<?= $deductions['id']?>"/>
                             <?php endif;?>
@@ -243,8 +258,10 @@
                       </select>
                     </td>
                     <td class="particular_rate_type">-</td>
+                    <td><?= $payslip['days_rendered'];?></td>
+                    <td>day/s</td>
                     <td>
-                      <input name=""  min="0" step="0.01" value="0" class="form-control pformat deduction_particular_amount" onchange="calculate_total_amount();"/>
+                      <input name=""  min="0" step="0.01" value="0" class="form-control pformat deduction_particular_amount"/>
                     </td>
                   </tr>
                 </tbody>
