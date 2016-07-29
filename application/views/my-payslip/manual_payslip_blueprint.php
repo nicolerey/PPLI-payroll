@@ -17,7 +17,7 @@
             <tr>
                 <td></td>
                 <td>Basic Rate</td>
-                <td>Daily</td>
+                <td class="p_type">Daily</td>
                 <td class="basic_rate">
                     <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $basic_rate?$basic_rate:0.00;?>"/>
                 </td>
@@ -52,7 +52,7 @@
                             <?= $emp_part['name'];?>
                             <input type="hidden" name="particular_id[]" value="<?= $emp_part['id']?>"/>
                         </td>
-                        <td><?= ($emp_part['particular_type']=='d')?'Daily':'Monthly';?></td>
+                        <td class="p_type"><?= ($emp_part['particular_type']=='d')?'Daily':'Monthly';?></td>
                         <td>
                             <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $emp_part['amount'];?>"/>
                         </td>
@@ -86,7 +86,7 @@
                         <?php endif;?>
                     </select>
                 </td>
-                <td class="particular_rate_type">-</td>
+                <td class="p_type">-</td>
                 <td>
                     <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate"/>
                 </td>

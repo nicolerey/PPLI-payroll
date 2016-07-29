@@ -34,7 +34,12 @@ foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
 							<?php if($additional['amount']!=0):?>
 								<div class="form-group">
 									<label class="col-xs-7 control-label"><?= $additional['name'];?>:</label>
-									<label class="col-xs-4"><u><?= number_format($additional['amount'], 2);?></u></label>
+									<label class="col-xs-4">
+										<u>
+											<?php $tot = ($additional['particular_type']=='d')?$additional['amount']*$employee_value['days_rendered']:$additional['amount'];?>
+											<?= number_format($tot, 2);?>
+										</u>
+									</label>
 								</div>
 							<?php endif;?>
 						<?php endforeach;?>
@@ -52,7 +57,11 @@ foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
 							<?php if($deduction['amount']!=0):?>
 								<div class="form-group">
 									<label class="col-xs-7 control-label"><?= $deduction['name'];?>:</label>
-									<label class="col-xs-4"><u><?= number_format($deduction['amount'], 2);?></u></label>
+									<label class="col-xs-4">
+										<u>
+											<?= number_format($deduction['amount'], 2);?>
+										</u>
+									</label>
 								</div>
 							<?php endif;?>
 						<?php endforeach;?>

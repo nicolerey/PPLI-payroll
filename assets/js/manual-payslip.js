@@ -151,7 +151,13 @@ $(document).on('keyup', '.particular_rate', function(){
 	console.log(particular_rate);
 	console.log(particular_days_rendered);
 
-	var particular_amount = particular_rate * particular_days_rendered;
+	var p_type = $('.p_type').html();
+	var particular_amount = 0;
+
+	if(p_type=='Monthly')
+		particular_amount = particular_rate;
+	else if(p_type=='Daily')
+		particular_amount = particular_rate * particular_days_rendered;
 	$(this).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
 
 	calculate_total_amount();

@@ -104,6 +104,9 @@ class Payslip extends HR_Controller
 				'current_daily_wage' => floatval(str_replace(',', '', $input['basic_rate']))
 			];
 
+			$emp_position = $this->employee->get_position($employee_id);
+			$payroll_update['overtime_pay'] = $payroll_update['current_daily_wage'] * ($emp_position['overtime_rate']/100);
+
 			$payroll_particulars_update = [];
 			if(isset($input['particular_id'])){
 				foreach ($input['particular_id'] as $key => $value) {

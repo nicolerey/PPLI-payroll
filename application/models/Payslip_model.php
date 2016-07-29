@@ -430,7 +430,7 @@ class Payslip_model extends CI_Model
 
 		$data = [];
 		foreach ($payroll_result as $key => $value) {
-			$this->db->select('pm.name, pm.type, pp.amount');
+			$this->db->select('pm.name, pm.type, pp.amount, pm.particular_type');
 			$this->db->join('pay_modifiers as pm', 'pm.id = pp.particulars_id');
 			$particulars = $this->db->get_where('payroll_particulars as pp', ['pp.payroll_id' => $value['id']])->result_array();
 
@@ -439,12 +439,16 @@ class Payslip_model extends CI_Model
 			$deductions = [];
 			foreach ($particulars as $particulars_key => $particulars_value) {
 				if($particulars_value['type']=='a'){
-					$total_particulars += $particulars_value['amount'];
 					$additionals[] = $particulars_value;
+
+					if($particulars_value['particular_type']=='d')
+						$total_particulars += $particulars_value['amount'] * $value['days_rendered'];
+					else
+						$total_particulars += $particulars_value['amount'];
 				}
 				else{
-					$total_particulars -= $particulars_value['amount'];
 					$deductions[] = $particulars_value;
+					$total_particulars -= $particulars_value['amount'];
 				}
 			}
 
@@ -456,7 +460,7 @@ class Payslip_model extends CI_Model
 				$total_particulars -= $loan_payments_value['payment_amount'];
 			}
 
-			$net_pay = ($value['current_daily_wage'] * $value['days_rendered']) + $value['overtime_pay'] - ($value['current_late_penalty'] * $value['late_minutes']) + $total_particulars;
+			$net_pay = ($value['current_daily_wage'] * $value['days_rendered']) + ($value['overtime_pay'] * $value['overtime_hours_rendered']) - ($value['current_late_penalty'] * $value['late_minutes']) + $total_particulars;
 
 			$start_date = date_format(date_create($value['start_date']), 'M d, Y');
 			$end_date = date_format(date_create($value['end_date']), 'M d, Y');
@@ -464,13 +468,14 @@ class Payslip_model extends CI_Model
 				'date' => "{$start_date} - {$end_date}",
 				'employee_name' => $value['employee_name'],
 				'regular_wage' => $value['current_daily_wage'] * $value['days_rendered'],
-				'overtime_pay' => $value['overtime_pay'],
+				'overtime_pay' => $value['overtime_pay'] * $value['overtime_hours_rendered'],
 				'late_pay' => $value['current_late_penalty'] * $value['late_minutes'],
 				'particulars' => $particulars,
 				'loan_payments' => $loan_payments,
 				'additionals' => $additionals,
 				'deductions' => $deductions,
-				'net_pay' => $net_pay
+				'net_pay' => $net_pay,
+				'days_rendered' => $value['days_rendered']
 			];
 		}
 

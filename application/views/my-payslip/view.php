@@ -72,7 +72,7 @@
                 <tr>
                   <td></td>
                   <td>Basic Rate</td>
-                  <td>Daily</td>
+                  <td class="p_type">Daily</td>
                   <td class="basic_rate">
                     <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $payslip['current_daily_wage'];?>"/>
                   </td>
@@ -86,7 +86,7 @@
                   <td></td>
                   <td>Overtime</td>
                   <td>Daily</td>
-                  <td><?= number_format($payslip['current_daily_wage'] * ($payslip['overtime_pay']/100), 2);?></td>
+                  <td><?= number_format($payslip['overtime_pay'], 2);?></td>
                   <td><?= number_format($payslip['overtime_hours_rendered'], 2);?></td>
                   <td>hour/s</td>
                   <td class="particular_amount"><?= number_format($payslip['overtime_pay'] * $payslip['overtime_hours_rendered'], 2);?></td>
@@ -105,7 +105,7 @@
                         <?= $additionals['name'];?>
                         <input type="hidden" name="particular_id[]" value="<?= $additionals['id']?>"/>
                       </td>
-                      <td><?= $add_type;?></td>
+                      <td class="p_type"><?= $add_type;?></td>
                       <td>
                         <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $additionals['amount'];?>"/>
                       </td>
@@ -114,7 +114,11 @@
                         day/s
                       </td>
                       <td class="particular_amount">
-                        <?= number_format($additionals['amount'] * $payslip['days_rendered'] * $additionals['units'], 2);?>
+                        <?php if($add_type=='Daily'):?>
+                          <?= number_format($additionals['amount'] * $payslip['days_rendered'], 2);?>
+                        <?php elseif($add_type=='Monthly'):?>
+                          <?= number_format($additionals['amount'], 2);?>
+                        <?php endif;?>
                       </td>
                     </tr>
                   <?php endforeach;?>
@@ -137,7 +141,7 @@
                       <?php endif;?>
                     </select>
                   </td>
-                  <td class="particular_rate_type">-</td>
+                  <td class="particular_rate_type p_type">-</td>
                   <td>
                     <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate" onkeyup="cha(this);" />
                   </td>
@@ -216,7 +220,7 @@
                         <tr>
                           <td></td>
                           <td><?= $deductions['name'];?></td>
-                          <td><?= $ded_type;?></td>
+                          <td class="p_type"><?= $ded_type;?></td>
                           <td><?= $payslip['days_rendered'];?></td>
                           <td>day/s</td>
                           <td>
@@ -257,7 +261,7 @@
                         <?php endif;?>
                       </select>
                     </td>
-                    <td class="particular_rate_type">-</td>
+                    <td class="particular_rate_type p_type">-</td>
                     <td><?= $payslip['days_rendered'];?></td>
                     <td>day/s</td>
                     <td>
