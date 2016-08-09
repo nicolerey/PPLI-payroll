@@ -24,6 +24,12 @@
           </div>
         </div>
         <div class="form-group">
+          <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Loan name</label>
+          <div class="col-sm-4">     
+            <input type="text" class="form-control" name="loan_name" value="<?= (isset($loan))?$loan['loan_name']:"";?>"/>
+          </div>
+        </div>
+        <div class="form-group">
           <label class="col-sm-2 control-label"><span class="fa fa-asterisk text-danger"></span> Employee</label>
           <div class="col-sm-3">
             <?= form_dropdown('employee_number', [ 'all' => '*All employees*' ]+ $employees, (isset($loan))?$loan['employee_id']:FALSE, 'class="form-control" required="required"')?>

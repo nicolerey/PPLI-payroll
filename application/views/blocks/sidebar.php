@@ -44,9 +44,11 @@
               </ul>
             </li>
             
-            <li class="<?= $active_nav === NAV_PAY_MODIFIERS? 'active' : '' ?>">
-                <a href="<?= "{$url}pay_modifiers" ?>"><i class="fa fa-cubes"></i> <span>Pay Particulars</span></a>
-            </li>
+            <?php if($this->session->userdata('account_type')!=='pm'):?>
+                <li class="<?= $active_nav === NAV_PAY_MODIFIERS? 'active' : '' ?>">
+                    <a href="<?= "{$url}pay_modifiers" ?>"><i class="fa fa-cubes"></i> <span>Pay Particulars</span></a>
+                </li>
+            <?php endif;?>
 
             <li class="treeview <?= $active_nav === NAV_MY_PAYSLIP ? 'active' : '' ?>">
               <a href="#">

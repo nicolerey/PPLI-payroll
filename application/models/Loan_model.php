@@ -36,6 +36,7 @@ class Loan_model extends CI_Model
 	public function create($data)
 	{
 		$loan_table_data = [
+			'loan_name' => $data['loan_name'],
 			'loan_date' => date_format(date_create($data['loan_date']), 'Y-m-d H:i:s'),
 			'employee_id' => $data['employee_number'],
 			'loan_amount' => $data['loan_amount']
@@ -54,6 +55,7 @@ class Loan_model extends CI_Model
 	{
 		$update_flag = 0;
 		$loan_table_data = [
+			'loan_name' => $data['loan_name'],
 			'employee_id' => $data['employee_number'],
 			'loan_amount' => $data['loan_amount']
 		];

@@ -31,7 +31,7 @@
         </div>
         <hr>
         <table class="table table-bordered table-condensed table-striped">
-          <thead><tr class="active"><th>#</th><th>Employee Name</th><th>Loan Date</th><th>Loan Amount</th><th></th></tr></thead>
+          <thead><tr class="active"><th>#</th><th>Loan Name</th><th>Employee Name</th><th>Loan Date</th><th>Loan Amount</th><th></th></tr></thead>
           <tbody>
             <?php if(empty($data)):?>
               <tr><td class="text-center" colspan="5">Nothing to display</td></tr>
@@ -40,6 +40,9 @@
                 <tr>
                   <td>
                   <a href="<?= base_url("loan/view/{$loan['loan']['id']}")?>"><?= str_pad($loan['loan']['id'], 4, 0, STR_PAD_LEFT)?></a>
+                  </td>
+                  <td>
+                    <?= $loan['loan']['loan_name'];?>
                   </td>
                   <td>
                     <?= $loan['name'];?>

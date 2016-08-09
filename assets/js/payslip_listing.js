@@ -39,6 +39,6 @@
 				wndw.print();
 				wndw.close();
 			});
-		})
-	})
-})(jQuery)
+		});
+	});
+})(jQuery);

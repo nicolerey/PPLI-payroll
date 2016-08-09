@@ -424,7 +424,7 @@ class Payslip_model extends CI_Model
 	public function get_by_batch_to_print($batch_id)
 	{
 		$this->db->select("p.*, e.id AS emp_id, CONCAT(e.firstname, ' ', e.middleinitial, '. ', e.lastname) AS employee_name", FALSE);
-		$this->db->where(['batch_id' => $batch_id]);
+		$this->db->where(['p.batch_id' => $batch_id, 'p.approval_status' => 1]);
 		$this->db->join('payroll as p', 'e.id = p.employee_id');
 		$payroll_result = $this->db->get('employees as e')->result_array();
 

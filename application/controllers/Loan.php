@@ -174,6 +174,7 @@ class Loan extends HR_Controller
 	public function _perform_validation()
 	{
 		$this->form_validation->set_rules('loan_date', 'loan date', 'required|callback__validate_date');
+		$this->form_validation->set_rules('loan_name', 'loan name', 'required');
 		$this->form_validation->set_rules('employee_number', 'employee', 'required');
 		$this->form_validation->set_rules('loan_amount', 'loan amount', 'required|callback__validate_numeric');
 		$this->form_validation->set_rules('payment_date[]', 'payment date', 'required|callback__validate_date');
@@ -186,6 +187,7 @@ class Loan extends HR_Controller
 		$loan_info = [];
 		$loan_info += elements([
 			'loan_date',
+			'loan_name',
 			'employee_number',
 			'loan_amount',
 			'id'

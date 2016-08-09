@@ -44,6 +44,15 @@ class Pay_modifiers extends HR_Controller
 	public function store()
 	{
 		$this->output->set_content_type('json');
+
+		if($this->session->userdata('account_type')==='pm'){
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => ['User is unauthorized to create pay particulars.']
+			]));
+			return;
+		}
+
 		$this->_perform_validation(MODE_CREATE);
 		if(!$this->form_validation->run()){
 			$this->output->set_output(json_encode([
@@ -67,6 +76,15 @@ class Pay_modifiers extends HR_Controller
 	public function update($id = FALSE)
 	{
 		$this->output->set_content_type('json');
+
+		if($this->session->userdata('account_type')==='pm'){
+			$this->output->set_output(json_encode([
+				'result' => FALSE,
+				'messages' => ['User is unauthorized to edit pay particulars.']
+			]));
+			return;
+		}
+
 		if(!$id || !$this->pay_modifier->exists($id)){
 			$this->output->set_output(json_encode([
 				'result' => FALSE,

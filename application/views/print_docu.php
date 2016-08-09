@@ -1,5 +1,11 @@
 <?= plugin_css('bootstrap/css/bootstrap.min.css')?>
 
+<style type="text/css">
+	.form-group{
+		margin-bottom: 0;
+	}
+</style>
+
 <?php 
 $chunk_by_four = array_chunk($payslips, 4);
 foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
@@ -12,7 +18,7 @@ foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
 				foreach($chunk_by_two_value as $employee_key=>$employee_value):?>
 					<div class="col-xs-6 form-horizontal" style="height: 100%; border: 1px solid;">
 						<div class="form-group">
-							<label class="col-xs-1">Date:</label>
+							<label class="col-xs-2">Date:</label>
 							<label class="col-xs-8"><?= $employee_value['date'];?></label>
 						</div>
 						<div class="form-group">
