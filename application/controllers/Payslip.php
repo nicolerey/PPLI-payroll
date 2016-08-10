@@ -8,7 +8,7 @@ class Payslip extends HR_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model(['Payslip_model' => 'payslip', 'Employee_model' => 'employee', 'Department_model' => 'department']);
+		$this->load->model(['Payslip_model' => 'payslip', 'Employee_model' => 'employee', 'Department_model' => 'department', 'Loan_model' => 'loan']);
 	}
 
 	public function index()
@@ -68,15 +68,9 @@ class Payslip extends HR_Controller
 		if($input){
 			$employee_id = $input['employee_id'];
 			$payroll_id = $input['id'];
-			//$salary_particular = [];
 			$payroll_particular = [];
 			if(isset($input['additional_name'])){
 				foreach ($input['additional_name'] as $key => $value) {
-					/*$salary_particular[] = [
-						'employee_id' => $employee_id,
-						'particulars_id' => $input['additional_name'][$key],
-						'amount' => floatval(str_replace(',', '', $input['additional_particular_rate'][$key]))
-					];*/
 					$payroll_particular[] = [
 						'payroll_id' => $payroll_id,
 						'particulars_id' => $input['additional_name'][$key],
@@ -87,11 +81,6 @@ class Payslip extends HR_Controller
 
 			if(isset($input['deduction_name'])){
 				foreach ($input['deduction_name'] as $key => $value) {
-					/*$salary_particular[] = [
-						'employee_id' => $employee_id,
-						'particulars_id' => $input['deduction_name'][$key],
-						'amount' => floatval(str_replace(',', '', $input['deduction_particular_rate'][$key]))
-					];*/
 					$payroll_particular[] = [
 						'payroll_id' => $payroll_id,
 						'particulars_id' => $input['deduction_name'][$key],
@@ -118,11 +107,19 @@ class Payslip extends HR_Controller
 					];
 				}
 			}
-			
+
+			$loan_data = [];
+			foreach ($input['loan_payment_id'] as $key => $value) {
+				$loan_data[] = [
+					'id' => $value,
+					'payment_amount' => $input['loan_payment'][$key]
+				];
+			}
+			$this->loan->update_payment_batch($loan_data);
 
 			$insert_flag = 0;
-			if(/*!empty($salary_particular) && */!empty($payroll_particular)){
-				if($this->payslip->insert_salary_particular(/*$salary_particular, */$payroll_particular))
+			if(!empty($payroll_particular)){
+				if($this->payslip->insert_salary_particular($payroll_particular))
 					$insert_flag = 1;
 			}
 			else

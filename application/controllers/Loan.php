@@ -177,9 +177,7 @@ class Loan extends HR_Controller
 		$this->form_validation->set_rules('loan_name', 'loan name', 'required');
 		$this->form_validation->set_rules('employee_number', 'employee', 'required');
 		$this->form_validation->set_rules('loan_amount', 'loan amount', 'required|callback__validate_numeric');
-		$this->form_validation->set_rules('payment_date[]', 'payment date', 'required|callback__validate_date');
-		$this->form_validation->set_rules('payment_amount[]', 'payment amount', 'required|callback__validate_numeric');
-		$this->form_validation->set_rules('payment_total', 'payment total', 'matches[loan_amount]');
+		$this->form_validation->set_rules('loan_minimum_pay', 'minimum loan payment', 'required');
 	}
 
 	public function _format_data()
@@ -190,19 +188,11 @@ class Loan extends HR_Controller
 			'loan_name',
 			'employee_number',
 			'loan_amount',
-			'id'
+			'id',
+			'loan_minimum_pay'
 		], $this->input->post(), NULL);
 
 		$loan_info['loan_amount'] = floatval(str_replace(',', '', $loan_info['loan_amount']));
-
-		$payment_date = $this->input->post('payment_date');
-		$payment_amount = $this->input->post('payment_amount');
-		if(count($payment_date)>0){
-			for($x=0; $x<count($payment_date); $x++){
-				$loan_info['payment_terms'][$x]['payment_date'] = date_format(date_create($payment_date[$x]), 'Y-m-d');
-				$loan_info['payment_terms'][$x]['payment_amount'] = floatval(str_replace(',', '', $payment_amount[$x]));
-			}
-		}
 
 		return $loan_info;
 	}

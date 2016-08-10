@@ -206,10 +206,7 @@ class Payslip_model extends CI_Model
 		$emp_loan = $this->loan->all($employee_data['id'], NULL, NULL, NULL, $from, $to);
 		if($emp_loan){
 			foreach ($emp_loan as $key => $loan) {
-				foreach ($loan['payment_terms'] as $payment_key => $payment_value) {
-					$data['deductions']['loan'][] = $payment_value;
-					$data['total_deductions'] += $payment_value['payment_amount'];
-				}
+				$data['total_deductions'] += $loan['loan_minimum_pay'];
 			}
 		}
 
@@ -326,6 +323,8 @@ class Payslip_model extends CI_Model
 
 	public function create($employee_number, $range, $batch_id, $adjustment = 0)
 	{
+		$this->load->model(['Loan_model' => 'loan']);
+
 		$payslip = $this->calculate($employee_number, $range[0], $range[1]);
 		if(is_numeric($payslip) || empty($payslip)){
 			return;
@@ -378,6 +377,24 @@ class Payslip_model extends CI_Model
 
 		if(!empty($particulars)){
 			$this->db->insert_batch('payroll_particulars', $particulars);
+		}
+
+		$loans = $this->loan->all($employee_number);
+		foreach ($loans as $key => $value) {
+			$payroll_data = [
+				'payroll_id' => $id,
+				'loan_id' => $value['id'],
+				'amount' => 0.00
+			];
+			$payment_data = [
+				'loan_id' => $value['id'],
+				'payroll_id' => $id,
+				'payment_date' => date('Y-m-d'),
+				'payment_amount' => $value['loan_minimum_pay']
+			];
+
+			$this->db->insert('payroll_particulars', $payroll_data);
+			$this->db->insert('payment_terms', $payment_data);
 		}
 
 		$this->db->trans_complete();
@@ -523,14 +540,6 @@ class Payslip_model extends CI_Model
 					$data['particulars']['additionals'][] = $p;
 				}else{
 					$data['particulars']['deductions'][] = $p;
-				}
-			}
-			$loan = $this->loan->all($data['employee_id'], NULL, NULL, NULL, $data['start_date'], $data['end_date']);
-			if($loan){
-				foreach ($loan as $loan_key => $loan_value) {
-					foreach ($loan_value['payment_terms'] as $payment_key => $payment_value) {
-						$data['particulars']['deductions']['loan'][] = $payment_value;
-					}
 				}
 			}
 		}

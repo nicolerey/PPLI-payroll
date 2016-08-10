@@ -210,37 +210,40 @@
                   </tr>
                   <?php if($payslip['particulars']['deductions']):?>
                     <?php foreach($payslip['particulars']['deductions'] as $key=>$deductions):?>
-                      <?php if($key!=='loan'):?>
-                        <?php
-                          if($deductions['type']=='d')
-                            $ded_type = "Daily";
-                          else
-                            $ded_type = "Monthly";
-                        ?>
-                        <tr>
-                          <td></td>
-                          <td><?= $deductions['name'];?></td>
-                          <td class="p_type"><?= $ded_type;?></td>
-                          <td><?= $payslip['days_rendered'];?></td>
-                          <td>day/s</td>
-                          <td>
-                            <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
-                            <?php if($key!=='loan'):?>
-                              <input type="hidden" name="particular_id[]" value="<?= $deductions['id']?>"/>
-                            <?php endif;?>
-                          </td>
-                        </tr>
-                      <?php endif;?>
-                      <?php if($key==='loan'):?>
-                        <?php foreach($deductions as $loan):?>
-                          <tr>
-                            <td></td>
-                            <td>Loan Payment - <?= $loan['payment_date'];?></td>
-                            <td>-</td>
-                            <td class="loan_payment_amount"><?= $loan['payment_amount'];?></td>
-                          </tr>
-                        <?php endforeach;?>
-                      <?php endif;?>
+                      <?php
+                        if($deductions['type']=='d')
+                          $ded_type = "Daily";
+                        else
+                          $ded_type = "Monthly";
+                      ?>
+                      <tr>
+                        <td></td>
+                        <td><?= $deductions['name'];?></td>
+                        <td class="p_type"><?= $ded_type;?></td>
+                        <td><?= $payslip['days_rendered'];?></td>
+                        <td>day/s</td>
+                        <td>
+                          <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
+                          <?php if($key!=='loan'):?>
+                            <input type="hidden" name="particular_id[]" value="<?= $deductions['id']?>"/>
+                          <?php endif;?>
+                        </td>
+                      </tr>
+                    <?php endforeach;?>
+                  <?php endif;?>
+                  <?php if($loans):?>
+                    <?php foreach($loans as $loan):?>
+                      <tr>
+                        <td></td>
+                        <td>Loan: <?= $loan['loan_name'];?></td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                          <input type="hidden" name="loan_payment_id[]" value="<?= $loan['id'];?>">
+                          <input  min="0" step="0.01" value="<?= $loan['payment_amount'];?>" class="form-control pformat deduction_particular_amount" name="loan_payment[]"/>
+                        </td>
+                      </tr>
                     <?php endforeach;?>
                   <?php endif;?>
                   <tr class="dynamic_ded_particulars hidden particular_group">

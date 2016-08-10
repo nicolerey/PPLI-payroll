@@ -78,7 +78,7 @@ class My_payslip extends HR_Controller
 
 	public function view($id)
 	{
-		$this->load->model(['Employee_model' => 'employee', 'Pay_modifier_model' => 'pay_modifier']);
+		$this->load->model(['Employee_model' => 'employee', 'Pay_modifier_model' => 'pay_modifier', 'Loan_model' => 'loan']);
 		
 		$payslip = $this->payslip->get_by_employee($id);
 		$employee = $this->employee->get($payslip['employee_id']);
@@ -98,6 +98,7 @@ class My_payslip extends HR_Controller
 		$this->generate_page('my-payslip/view', [
 			'batch_id' => $payslip['batch_id'],
 			'payslip' => $payslip,
+			'loans' => $this->loan->get_payroll_loans($id),
 			'employee_data' => $employee,
 			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)
 		]);

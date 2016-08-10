@@ -33,22 +33,29 @@ class Loan_model extends CI_Model
 		return $loans;
 	}
 
+	public function get_payroll_loans($payroll_id)
+	{
+		$this->db->select('pt.*, l.loan_name, l.loan_minimum_pay');
+		$this->db->join('loans as l', 'l.id=pt.loan_id');
+		$this->db->where('pt.payroll_id', $payroll_id);
+		return $this->db->get('payment_terms as pt')->result_array();
+	}
+
+	public function update_payment_batch($data)
+	{
+		return $this->db->update_batch('payment_terms', $data, 'id');
+	}
+
 	public function create($data)
 	{
 		$loan_table_data = [
 			'loan_name' => $data['loan_name'],
 			'loan_date' => date_format(date_create($data['loan_date']), 'Y-m-d H:i:s'),
 			'employee_id' => $data['employee_number'],
-			'loan_amount' => $data['loan_amount']
+			'loan_amount' => $data['loan_amount'],
+			'loan_minimum_pay' => $data['loan_minimum_pay']
 		];
-		$this->db->insert('loans', $loan_table_data);
-
-		$loan_id = $this->db->insert_id();
-		foreach ($data['payment_terms'] as $key=>$value) {
-			$data['payment_terms'][$key]['loan_id'] = $loan_id;
-		}
-
-		return $this->db->insert_batch('payment_terms', $data['payment_terms']);
+		return $this->db->insert('loans', $loan_table_data);
 	}
 
 	public function update_loan($data)
@@ -56,25 +63,13 @@ class Loan_model extends CI_Model
 		$update_flag = 0;
 		$loan_table_data = [
 			'loan_name' => $data['loan_name'],
+			'loan_date' => date_format(date_create($data['loan_date']), 'Y-m-d H:i:s'),
 			'employee_id' => $data['employee_number'],
-			'loan_amount' => $data['loan_amount']
+			'loan_amount' => $data['loan_amount'],
+			'loan_minimum_pay' => $data['loan_minimum_pay']
 		];
 		$this->db->where('id', $data['id']);
-		if($this->db->update($this->table, $loan_table_data))
-			$update_flag = 1;
-
-		$this->db->where('loan_id', $data['id']);
-		$this->db->delete('payment_terms');
-
-		$insert_flag = 0;
-		$loan_id = $data['id'];
-		foreach ($data['payment_terms'] as $key=>$value) {
-			$data['payment_terms'][$key]['loan_id'] = $loan_id;
-		}
-		if($this->db->insert_batch('payment_terms', $data['payment_terms']))
-			$insert_flag = 1;
-
-		return ($update_flag && $insert_flag)?TRUE:FALSE;
+		return $this->db->update($this->table, $loan_table_data);
 	}
 
 	public function delete($id)
