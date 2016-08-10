@@ -108,12 +108,37 @@ class Payslip extends HR_Controller
 				}
 			}
 
+			$loan_balance = [];
+			$loan = [];
+			foreach ($input['loan_id'] as $key => $value) {
+				$loan[] = $this->loan->get_payroll_loans(false, false, $value, 'SING');
+				$loan_balance[] = $loan[0]['p_total'];
+			}
+
 			$loan_data = [];
 			foreach ($input['loan_payment_id'] as $key => $value) {
 				$loan_data[] = [
 					'id' => $value,
 					'payment_amount' => $input['loan_payment'][$key]
 				];
+
+				if($input['loan_payment'][$key] < $loan[$key]['loan_minimum_pay']){
+					if($loan_balance[$key]+$input['loan_payment'][$key] < $loan[$key]['loan_amount']){
+						$this->output->set_output(json_encode([
+							'result' => FALSE,
+							'messages' => ['Loan payment for "Loan: '.$loan[$key]['loan_name'].'" cannot be less than '.$loan[$key]['loan_minimum_pay'].'.']
+						]));
+						return;
+					}
+				}
+
+				if($loan_balance[$key]+$input['loan_payment'][$key] > $loan[$key]['loan_amount']){
+					$this->output->set_output(json_encode([
+						'result' => FALSE,
+						'messages' => ['Loan payment cannot be greater than loan amount.']
+					]));
+					return;
+				}
 			}
 			$this->loan->update_payment_batch($loan_data);
 

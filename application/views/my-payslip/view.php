@@ -240,6 +240,7 @@
                         <td>-</td>
                         <td>-</td>
                         <td>
+                          <input type="hidden" name="loan_id[]" value="<?= $loan['loan_id'];?>">
                           <input type="hidden" name="loan_payment_id[]" value="<?= $loan['id'];?>">
                           <input  min="0" step="0.01" value="<?= $loan['payment_amount'];?>" class="form-control pformat deduction_particular_amount" name="loan_payment[]"/>
                         </td>

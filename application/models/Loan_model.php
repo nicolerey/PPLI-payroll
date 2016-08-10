@@ -33,12 +33,32 @@ class Loan_model extends CI_Model
 		return $loans;
 	}
 
-	public function get_payroll_loans($payroll_id)
+	public function get_payroll_loans($payroll_id = false, $payment_id = false, $loan_id = false, $type = 'MUL')
 	{
-		$this->db->select('pt.*, l.loan_name, l.loan_minimum_pay');
+		$this->db->select('pt.*, l.loan_name, l.loan_minimum_pay, l.loan_amount, l.id as loan_id');
 		$this->db->join('loans as l', 'l.id=pt.loan_id');
-		$this->db->where('pt.payroll_id', $payroll_id);
-		return $this->db->get('payment_terms as pt')->result_array();
+
+		if($payroll_id)
+			$this->db->where('pt.payroll_id', $payroll_id);
+		if($payment_id)
+			$this->db->where('pt.id', $payment_id);
+		if($loan_id)
+			$this->db->where('loan_id', $loan_id);
+
+		if($type=='MUL')
+			return $this->db->get('payment_terms as pt')->result_array();
+		else{
+			$this->db->select('SUM(pt.payment_amount) as p_total');
+			return $this->db->get('payment_terms as pt')->row_array();
+		}
+	}
+
+	public function get_loan_and_payments($loan_id)
+	{
+		$loan = $this->db->get_where('loans', ['id' => $loan_id])->row_array();
+		$loan['payments'] = $this->db->get_where('payment_terms', ['loan_id' => $loan_id])->result_array();
+
+		return $loan;
 	}
 
 	public function update_payment_batch($data)
