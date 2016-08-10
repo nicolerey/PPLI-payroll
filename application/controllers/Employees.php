@@ -40,13 +40,22 @@ class Employees extends HR_Controller
 		if(!$id || !$employee = $this->employee->get($id)){
 			show_404();
 		}
-		$this->load->model(['Department_model' => 'department', 'Position_model' => 'position', 'Pay_modifier_model' => 'particulars']);
+
+		$this->load->model(['Department_model' => 'department', 'Position_model' => 'position', 'Pay_modifier_model' => 'particulars', 'Employee_reports_model' => 'reports']);
+
+		$employee_reports = $this->reports->all(['employee_id' => $id], "id, employee_id, title, date, status, created_by");
+		foreach ($employee_reports as $key => $value) {
+			$employee_reports[$key]['employee_name'] = $this->employee->get_employee_name($value['employee_id']);
+			$employee_reports[$key]['created_by'] = $this->employee->get_employee_name($value['created_by']);
+		}
+
 		$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js', 'price-format.js']);
 		$this->import_page_script('manage-employees.js');
 		$this->generate_page('employees/manage', [
 			'title' => 'Update existing employee',
 			'mode' => MODE_EDIT, 
 			'data' => $employee,
+			'reports' => $employee_reports,
 			'departments' => array_column($this->department->all(), 'name', 'id'),
 			'positions' => array_column($this->position->all(), 'name', 'id'),
 		]);

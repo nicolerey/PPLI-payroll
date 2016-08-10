@@ -10,10 +10,57 @@
     <!-- Tabs within a box -->
     <ul class="nav nav-tabs pull-right">
       <li class="active"><a href="#basic" data-toggle="tab">Personal Information</a></li>
+      <li><a href="#reports" data-toggle="tab">Employee Reports</a></li>
       <li class="pull-left header"><?= $title ?></li>
     </ul>
     <div class="tab-content">
       <!-- Morris chart - Sales -->
+      <div class="tab-pane" id="reports">
+        <table class="table table-bordered table-condensed table-striped">
+          <thead>
+            <tr class="active">
+              <th>#</th><th>Report date</th><th>Title</th><th>Employee</th><th>Created by</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if(empty($reports)):?>
+              <tr><td class="text-center" colspan="6">Nothing to display</td></tr>
+            <?php else:?>
+              <?php foreach($reports as $reports):?>
+                <tr>
+                  <td>
+                    <a href="<?= base_url("employee_reports/view/{$reports['id']}");?>"><?= str_pad($reports['id'], 4, 0, STR_PAD_LEFT)?></a>
+                  </td>
+                  <td>
+                    <?= date_format(date_create($reports['date']), 'm/d/Y');?>
+                  </td>
+                  <td>
+                    <?= $reports['title'];?>
+                  </td>
+                  <td>
+                    <?= "{$reports['employee_name']['firstname']} {$reports['employee_name']['middleinitial']}. {$reports['employee_name']['lastname']}";?>
+                  </td>
+                  <td>
+                    <?= "{$reports['created_by']['firstname']} {$reports['created_by']['middleinitial']}. {$reports['created_by']['lastname']}";?>
+                  </td>
+                  <td>
+                    <span class="label label-<?= ($reports['status'])?'success':'warning';?>">
+                      <?= ($reports['status'])?'Resolved':'Unresolved';?>
+                    </span>
+                  </td>
+                  <td>
+                    <?php if(!$reports['status']):?>
+                      <button type="button" pk="<?= $reports['id'];?>" data-url="<?= base_url('employee_reports/delete');?>" class="btn btn-flat btn-danger btn-xs" onclick="delete_report(this);">
+                        <span class="glyphicon glyphicon-remove"></span> Delete
+                      </button>
+                    <?php endif;?>
+                  </td>
+                </tr>
+              <?php endforeach;?>
+            <?php endif;?>
+          </tbody>
+        </table>
+      </div>
       <div class="tab-pane active" id="basic">
         <form class="form-horizontal" data-action="<?= $mode === MODE_CREATE ? "{$url}/store" : "{$url}/update/{$data['id']}" ?>">
             <div class="alert alert-info"><p>Fields marked with <span class="fa fa-asterisk text-danger"></span> are required.</p></div>
