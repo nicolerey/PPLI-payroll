@@ -41,7 +41,7 @@ class Employees extends HR_Controller
 			show_404();
 		}
 
-		$this->load->model(['Department_model' => 'department', 'Position_model' => 'position', 'Pay_modifier_model' => 'particulars', 'Employee_reports_model' => 'reports']);
+		$this->load->model(['Department_model' => 'department', 'Position_model' => 'position', 'Pay_modifier_model' => 'particulars', 'Employee_reports_model' => 'reports', 'Payslip_model' => 'payslip']);
 
 		$employee_reports = $this->reports->all(['employee_id' => $id], "id, employee_id, title, date, status, created_by");
 		foreach ($employee_reports as $key => $value) {
@@ -55,6 +55,7 @@ class Employees extends HR_Controller
 			'title' => 'Update existing employee',
 			'mode' => MODE_EDIT, 
 			'data' => $employee,
+			'items' => $this->payslip->all($id),
 			'reports' => $employee_reports,
 			'departments' => array_column($this->department->all(), 'name', 'id'),
 			'positions' => array_column($this->position->all(), 'name', 'id'),

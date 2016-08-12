@@ -175,6 +175,20 @@
                         </tr>
                     <?php endif;?>
                 <?php endforeach;?>
+                <?php if($loans):?>
+                    <?php foreach($loans as $loan):?>
+                      <tr>
+                        <td></td>
+                        <td>Loan: <?= $loan['loan_name'];?></td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                          <input  min="0" step="0.01" value="<?= $loan['loan_minimum_pay'];?>" class="form-control pformat deduction_particular_amount" name="loan_payment[]"/>
+                        </td>
+                      </tr>
+                    <?php endforeach;?>
+                  <?php endif;?>
             <tr class="dynamic_ded_particulars hidden particular_group">
                 <td>
                 <button type="button" class="btn btn-flat btn-danger" onclick="delete_particular_group(this);">

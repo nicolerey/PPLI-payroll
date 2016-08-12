@@ -33,7 +33,30 @@ class Loan_model extends CI_Model
 		return $loans;
 	}
 
-	public function get_payroll_loans($payroll_id = false, $payment_id = false, $loan_id = false, $type = 'MUL')
+	public function insert_loan_payment($payroll_id, $employee_number, $payments)
+	{
+		$loans = $this->all($employee_number);
+		foreach ($loans as $key => $value) {
+			$payroll_data = [
+				'payroll_id' => $payroll_id,
+				'loan_id' => $value['id'],
+				'amount' => 0.00
+			];
+			$payment_data = [
+				'loan_id' => $value['id'],
+				'payroll_id' => $payroll_id,
+				'payment_date' => date('Y-m-d'),
+				'payment_amount' => $payments[$key]
+			];
+
+			$this->db->insert('payroll_particulars', $payroll_data);
+			$this->db->insert('payment_terms', $payment_data);
+		}
+
+		return;
+	}
+
+	public function get_payroll_loans($payroll_id = false, $payment_id = false, $loan_id = false, $type = 'MUL', $emp_id = false)
 	{
 		$this->db->select('pt.*, l.loan_name, l.loan_minimum_pay, l.loan_amount, l.id as loan_id');
 		$this->db->join('loans as l', 'l.id=pt.loan_id');

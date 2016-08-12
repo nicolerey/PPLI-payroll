@@ -49,7 +49,7 @@ class My_payslip extends HR_Controller
 
 	public function select_employee()
 	{
-		$this->load->model(['Employee_model' => 'employee', 'Position_model' => 'position', 'Pay_modifier_model' => 'pay_modifier']);
+		$this->load->model(['Employee_model' => 'employee', 'Position_model' => 'position', 'Pay_modifier_model' => 'pay_modifier', 'Loan_model' => 'loan']);
 
 		$input = $this->input->post();
 
@@ -70,6 +70,7 @@ class My_payslip extends HR_Controller
 			'overtime_rate' => $emp_position['overtime_rate'],
 			'late_penalty_rate' => $emp_position['late_penalty'],
 			'emp_particulars' => $position['particulars'],
+			'loans' => $this->loan->all($input['id']),
 			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)
 		];
 
@@ -169,7 +170,7 @@ class My_payslip extends HR_Controller
 			}
 		}
 
-		if($this->payslip->create_manual_payslip($payroll_data, $payroll_particulars_data)){
+		if($this->payslip->create_manual_payslip($payroll_data, $payroll_particulars_data, $input['loan_payment'])){
 			$this->output->set_output(json_encode([
 				'result' => TRUE,
 				'messages' => []

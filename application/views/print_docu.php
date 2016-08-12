@@ -71,6 +71,19 @@ foreach ($chunk_by_four as $chunk_by_four_key => $chunk_by_four_value):?>
 								</div>
 							<?php endif;?>
 						<?php endforeach;?>
+						<?php
+						foreach($employee_value['loan_payments'] as $loan_payment):?>					
+							<?php if($loan_payment['payment_amount']!=0):?>
+								<div class="form-group">
+									<label class="col-xs-7 control-label">Loan: <?= $loan_payment['loan_name'];?>:</label>
+									<label class="col-xs-4">
+										<u>
+											<?= number_format($loan_payment['payment_amount'], 2);?>
+										</u>
+									</label>
+								</div>
+							<?php endif;?>
+						<?php endforeach;?>
 						<div class="form-group">
 							<label class="col-xs-7 control-label">TOTAL AMOUNT:</label>
 							<label class="col-xs-4"><u><?= number_format($employee_value['net_pay'], 2);?></u></label>

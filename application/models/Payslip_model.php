@@ -402,7 +402,7 @@ class Payslip_model extends CI_Model
 		return $this->db->trans_status();
 	}
 
-	public function create_manual_payslip($payroll_data, $payroll_particulars_data)
+	public function create_manual_payslip($payroll_data, $payroll_particulars_data, $payments = false)
 	{
 		if($this->db->insert($this->table, $payroll_data)){
 
@@ -410,6 +410,9 @@ class Payslip_model extends CI_Model
 			foreach ($payroll_particulars_data as $key => $value) {
 				$payroll_particulars_data[$key]['payroll_id'] = $id;
 			}
+
+			$this->load->model('Loan_model', 'loan');
+			$this->loan->insert_loan_payment($id, $payroll_data['employee_id'], $payments);
 
 			if(!empty($payroll_particulars_data) && $this->db->insert_batch('payroll_particulars', $payroll_particulars_data))
 				return true;
@@ -447,13 +450,19 @@ class Payslip_model extends CI_Model
 
 		$data = [];
 		foreach ($payroll_result as $key => $value) {
+			$additionals = [];
+			$deductions = [];
+			$total_particulars = 0;
+			
+			$this->load->model('Loan_model', 'loan');
+			$loan_payments = $this->loan->get_payroll_loans($value['id']);
+			foreach ($loan_payments as $loan_key => $loan_value) {
+				$total_particulars -= $loan_value['payment_amount'];
+			}
+
 			$this->db->select('pm.name, pm.type, pp.amount, pm.particular_type');
 			$this->db->join('pay_modifiers as pm', 'pm.id = pp.particulars_id');
 			$particulars = $this->db->get_where('payroll_particulars as pp', ['pp.payroll_id' => $value['id']])->result_array();
-
-			$total_particulars = 0;
-			$additionals = [];
-			$deductions = [];
 			foreach ($particulars as $particulars_key => $particulars_value) {
 				if($particulars_value['type']=='a'){
 					$additionals[] = $particulars_value;
@@ -467,14 +476,6 @@ class Payslip_model extends CI_Model
 					$deductions[] = $particulars_value;
 					$total_particulars -= $particulars_value['amount'];
 				}
-			}
-
-			$this->db->select('pt.payment_amount, pt.payment_date');
-			$this->db->join('loans as l', 'l.id = pt.loan_id');
-			$this->db->where(['pt.payment_date >=' => $value['start_date'], 'pt.payment_date <=' => $value['end_date'], 'l.employee_id' => $value['emp_id']]);
-			$loan_payments = $this->db->get('payment_terms as pt')->result_array();
-			foreach ($loan_payments as $loan_payments_key => $loan_payments_value) {
-				$total_particulars -= $loan_payments_value['payment_amount'];
 			}
 
 			$net_pay = ($value['current_daily_wage'] * $value['days_rendered']) + ($value['overtime_pay'] * $value['overtime_hours_rendered']) - ($value['current_late_penalty'] * $value['late_minutes']) + $total_particulars;

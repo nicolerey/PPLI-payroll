@@ -181,13 +181,14 @@ $(document).ready(function(){
 		
 		$.post(that.data('action'), that.serialize())
 		.done(function(response){
-			/*if(response.result){
+			console.log(response);
+			if(response.result){
 				window.location.href = $('.cancel').attr('href');
 				return;
 			}
 
 			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
-			$('html, body').animate({scrollTop: 0}, 'slow');*/
+			$('html, body').animate({scrollTop: 0}, 'slow');
 		})
 		.fail(function(){
 			alert('An internal error has occured. Please try again.');
