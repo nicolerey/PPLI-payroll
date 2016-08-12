@@ -321,6 +321,12 @@ class Payslip_model extends CI_Model
 		return $this->db->get($this->table)->row_array();
 	}
 
+	public function get_payroll_status($id)
+	{
+		$this->db->select('approval_status');
+		return $this->db->get_where($this->table, ['id' => $id])->row_array();
+	}
+
 	public function create($employee_number, $range, $batch_id, $adjustment = 0)
 	{
 		$this->load->model(['Loan_model' => 'loan']);
@@ -381,20 +387,27 @@ class Payslip_model extends CI_Model
 
 		$loans = $this->loan->all($employee_number);
 		foreach ($loans as $key => $value) {
-			$payroll_data = [
-				'payroll_id' => $id,
-				'loan_id' => $value['id'],
-				'amount' => 0.00
-			];
-			$payment_data = [
-				'loan_id' => $value['id'],
-				'payroll_id' => $id,
-				'payment_date' => date('Y-m-d'),
-				'payment_amount' => $value['loan_minimum_pay']
-			];
+			$payment_total = 0;
+			foreach ($value['payment_terms'] as $payments_key => $payments_value) {
+				$payment_total += $payments_value['payment_amount'];
+			}
 
-			$this->db->insert('payroll_particulars', $payroll_data);
-			$this->db->insert('payment_terms', $payment_data);
+			if($payment_total<$value['loan_amount']){
+				$payroll_data = [
+					'payroll_id' => $id,
+					'loan_id' => $value['id'],
+					'amount' => 0.00
+				];
+				$payment_data = [
+					'loan_id' => $value['id'],
+					'payroll_id' => $id,
+					'payment_date' => date('Y-m-d'),
+					'payment_amount' => $value['loan_minimum_pay']
+				];
+
+				$this->db->insert('payroll_particulars', $payroll_data);
+				$this->db->insert('payment_terms', $payment_data);
+			}
 		}
 
 		$this->db->trans_complete();
@@ -450,6 +463,9 @@ class Payslip_model extends CI_Model
 
 		$data = [];
 		foreach ($payroll_result as $key => $value) {
+			$this->db->where('id', $value['id']);
+			$this->db->update($this->table, ['is_printed' => TRUE]);
+
 			$additionals = [];
 			$deductions = [];
 			$total_particulars = 0;
@@ -503,6 +519,7 @@ class Payslip_model extends CI_Model
 	public function get_batches()
 	{
 		$this->db->select('DISTINCT(batch_id), start_date, end_date');
+		$this->db->order_by('end_date', 'DESC');
 		return $this->db->get($this->table)->result_array();
 	}
 

@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 10, 2016 at 06:16 PM
+-- Generation Time: Aug 21, 2016 at 11:22 AM
 -- Server version: 10.1.13-MariaDB
--- PHP Version: 5.6.23
+-- PHP Version: 7.0.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -1222,7 +1222,19 @@ CREATE TABLE `payment_terms` (
 
 INSERT INTO `payment_terms` (`id`, `loan_id`, `payroll_id`, `payment_date`, `payment_amount`) VALUES
 (17, 3, 40, '2016-08-10', '5.00'),
-(18, 2, 40, '2016-08-10', '2.00');
+(18, 2, 40, '2016-08-10', '2.00'),
+(19, 3, 41, '2016-08-12', '2.00'),
+(20, 2, 41, '2016-08-12', '5.00'),
+(21, 3, 42, '2016-08-12', '2.00'),
+(22, 2, 42, '2016-08-12', '5.00'),
+(23, 3, 43, '2016-08-12', '2.00'),
+(24, 2, 43, '2016-08-12', '5.00'),
+(25, 3, 44, '2016-08-12', '2.00'),
+(26, 2, 44, '2016-08-12', '5.00'),
+(27, 3, 45, '2016-08-12', '2.00'),
+(28, 2, 45, '2016-08-12', '5.00'),
+(29, 3, 46, '2016-08-12', '5.00'),
+(30, 2, 46, '2016-08-12', '1.00');
 
 -- --------------------------------------------------------
 
@@ -1244,6 +1256,7 @@ CREATE TABLE `payroll` (
   `current_late_penalty` decimal(13,2) DEFAULT '0.00',
   `overtime_pay` decimal(13,2) DEFAULT '0.00',
   `batch_id` int(10) NOT NULL,
+  `is_printed` tinyint(1) NOT NULL DEFAULT '0',
   `approval_status` tinyint(1) NOT NULL DEFAULT '0',
   `approved_by` int(10) UNSIGNED DEFAULT NULL,
   `created_by` int(10) UNSIGNED NOT NULL,
@@ -1254,13 +1267,19 @@ CREATE TABLE `payroll` (
 -- Dumping data for table `payroll`
 --
 
-INSERT INTO `payroll` (`id`, `employee_id`, `start_date`, `end_date`, `days_rendered`, `overtime_hours_rendered`, `late_minutes`, `current_daily_wage`, `daily_wage_units`, `wage_adjustment`, `current_late_penalty`, `overtime_pay`, `batch_id`, `approval_status`, `approved_by`, `created_by`, `date_created`) VALUES
-(28, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 3, 3, '2016-08-10 14:27:23'),
-(29, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 3, 3, '2016-08-10 14:27:23'),
-(30, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 0, 3, 3, '2016-08-10 14:27:23'),
-(31, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 3, 3, '2016-08-10 14:27:23'),
-(36, 268, '2016-07-01', '2016-08-30', 2.49, 2, 5, '200.00', 1, '0.00', '5.00', '20.00', 30, 1, 3, 3, '2016-08-10 14:27:23'),
-(40, 268, '2016-07-01', '2016-08-31', 2.49, 2, 5, '200.00', 1, '0.00', '5.00', '20.00', 34, 1, 3, 3, '2016-08-10 15:44:24');
+INSERT INTO `payroll` (`id`, `employee_id`, `start_date`, `end_date`, `days_rendered`, `overtime_hours_rendered`, `late_minutes`, `current_daily_wage`, `daily_wage_units`, `wage_adjustment`, `current_late_penalty`, `overtime_pay`, `batch_id`, `is_printed`, `approval_status`, `approved_by`, `created_by`, `date_created`) VALUES
+(28, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '20000.10', 1, '0.00', '5.00', '2000.01', 28, 1, 1, 3, 3, '2016-08-10 14:27:23'),
+(29, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 1, 3, 3, '2016-08-10 14:27:23'),
+(30, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 1, 3, 3, '2016-08-10 14:27:23'),
+(31, 268, '2016-07-01', '2016-07-31', 2.49, 2, 5, '2000.01', 1, '0.00', '5.00', '200.00', 28, 1, 1, 3, 3, '2016-08-10 14:27:23'),
+(36, 268, '2016-07-01', '2016-08-30', 2.49, 2, 5, '200.00', 1, '0.00', '5.00', '20.00', 30, 0, 1, 3, 3, '2016-08-10 14:27:23'),
+(40, 268, '2016-07-01', '2016-08-31', 2.49, 2, 5, '200.00', 1, '0.00', '5.00', '20.00', 34, 0, 1, 3, 3, '2016-08-10 15:44:24'),
+(41, 268, '2016-08-02', '2016-08-03', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 35, 0, 1, 3, 3, '2016-08-12 14:45:34'),
+(42, 268, '2016-08-02', '2016-08-03', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 36, 0, 1, 3, 3, '2016-08-12 14:45:42'),
+(43, 268, '2016-08-02', '2016-08-03', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 37, 0, 1, 3, 3, '2016-08-12 14:46:10'),
+(44, 268, '2016-08-02', '2016-08-03', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 38, 0, 1, 3, 3, '2016-08-12 14:48:31'),
+(45, 268, '2016-08-02', '2016-08-03', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 39, 0, 1, 3, 3, '2016-08-12 14:49:39'),
+(46, 268, '2016-08-22', '2016-08-24', 0, 0, 0, '200.00', 1, '0.00', '5.00', '10.00', 40, 0, 1, 3, 3, '2016-08-12 14:53:29');
 
 -- --------------------------------------------------------
 
@@ -1291,7 +1310,19 @@ INSERT INTO `payroll_particulars` (`id`, `payroll_id`, `particulars_id`, `loan_i
 (45, 36, NULL, 2, 1, '0.00'),
 (55, 40, 5, NULL, 1, '100.00'),
 (56, 40, NULL, 3, 1, '0.00'),
-(57, 40, NULL, 2, 1, '0.00');
+(57, 40, NULL, 2, 1, '0.00'),
+(58, 41, NULL, 3, 1, '0.00'),
+(59, 41, NULL, 2, 1, '0.00'),
+(60, 42, NULL, 3, 1, '0.00'),
+(61, 42, NULL, 2, 1, '0.00'),
+(62, 43, NULL, 3, 1, '0.00'),
+(63, 43, NULL, 2, 1, '0.00'),
+(64, 44, NULL, 3, 1, '0.00'),
+(65, 44, NULL, 2, 1, '0.00'),
+(66, 45, NULL, 3, 1, '0.00'),
+(67, 45, NULL, 2, 1, '0.00'),
+(68, 46, NULL, 3, 1, '0.00'),
+(69, 46, NULL, 2, 1, '0.00');
 
 -- --------------------------------------------------------
 
@@ -1604,17 +1635,17 @@ ALTER TABLE `loans`
 -- AUTO_INCREMENT for table `payment_terms`
 --
 ALTER TABLE `payment_terms`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 --
 -- AUTO_INCREMENT for table `payroll`
 --
 ALTER TABLE `payroll`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 --
 -- AUTO_INCREMENT for table `payroll_particulars`
 --
 ALTER TABLE `payroll_particulars`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 --
 -- AUTO_INCREMENT for table `pay_modifiers`
 --

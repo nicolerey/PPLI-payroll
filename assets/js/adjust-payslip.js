@@ -1,17 +1,15 @@
 function calculate_total_amount(){
-	console.log('nicole');
-
 	var total_additional_amount = 0;
 	$('.particular_amount').each(function(){
-		total_additional_amount += Number($(this).html().replace(",", ""));
+		total_additional_amount += Number($(this).html().replace(/,/g, ""));
 	});
 
 	var total_deduction_amount = 0;
 	$('.deduction_particular_amount').each(function(){
-		total_deduction_amount += Number($(this).val().replace(",", ""));
+		total_deduction_amount += Number($(this).val().replace(/,/g, ""));
 	});
 	$('.loan_payment_amount').each(function(){
-		total_deduction_amount += Number($(this).html().replace(",", ""));
+		total_deduction_amount += Number($(this).html().replace(/,/g, ""));
 	});
 	total_deduction_amount += Number($('.late_penalty').html());
 
@@ -69,39 +67,20 @@ function change_particular_type(element){
 	$(element).parent().parent().find('.particular_rate_type').html(type_name);
 }
 
-function cha(element){
-	var particular_rate = 0;
-	var particular_days_rendered = 0;
-	var particular_unit = 0
-
-	particular_rate = $(element).val();
-	particular_days_rendered = $('.particular_days_rendered').html();
-
-	var particular_amount = (particular_rate * 10) * particular_days_rendered;
-	$(element).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
-
-	calculate_total_amount();
-}
-
-function chh(va, element){
-	console.log(va);
-	//$(element).val(va*10);
-
-	calculate_total_amount();
-}
-
 $(document).on('keyup', '.particular_rate', function(){
 	var particular_rate = 0;
 	var particular_days_rendered = 0;
-	var particular_unit = 0
+	var particular_unit = 0;
 
-	particular_rate = $(this).val().replace(",", "");
+	particular_rate = $(this).val().replace(/,/g, "");
 	particular_days_rendered = $('.particular_days_rendered').html();
+
+	console.log(particular_rate);
 
 	var p_type = $(this).parent().parent().find('.p_type').html();
 	var particular_amount = 0;
 	if(p_type=='Monthly')
-		particular_amount = particular_rate;
+		particular_amount = parseFloat(particular_rate);
 	else if(p_type=='Daily')
 		particular_amount = particular_rate * particular_days_rendered;
 	$(this).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
@@ -112,15 +91,15 @@ $(document).on('keyup', '.particular_rate', function(){
 $(document).on('keyup', '.deduction_particular_amount', function(){
 	var total_additional_amount = 0;
 	$('.particular_amount').each(function(){
-		total_additional_amount += Number(($(this).html()).replace(",", ""));
+		total_additional_amount += Number(($(this).html()).replace(/,/g, ""));
 	});
 
 	var total_deduction_amount = 0;
 	$('.deduction_particular_amount').each(function(){
-		total_deduction_amount += Number(($(this).val()).replace(",", ""));
+		total_deduction_amount += Number(($(this).val()).replace(/,/g, ""));
 	});
 	$('.loan_payment_amount').each(function(){
-		total_deduction_amount += Number(($(this).html()).replace(",", ""));
+		total_deduction_amount += Number(($(this).html()).replace(/,/g, ""));
 	});
 	total_deduction_amount += Number($('.late_penalty').html());
 
@@ -142,9 +121,7 @@ $(document).ready(function(){
 		$.post($(this).data('action'), {id: $(this).data('pk')})
 		.done(function(response){
 			if(response.result){
-				$('.approval_status').text('Approved');
-				btn.hide();
-
+				window.location.href = $('.cancel').attr('href');
 				return;
 			}
 
@@ -156,42 +133,24 @@ $(document).ready(function(){
 		});
 	});
 
-	/*$('.deduction_particular_amount').on('keyup', function(){
-		var total_additional_amount = 0;
-		$('.particular_amount').each(function(){
-			total_additional_amount += Number(($(this).html()).replace(",", ""));
+	$('#unapprove_button').on('click', function(){
+		var btn = $(this);
+		var msgBox = $('.alert-danger').addClass('hidden');
+
+		$.post($(this).data('action'), {id: $(this).data('pk')})
+		.done(function(response){
+			if(response.result){
+				window.location.href = $('.cancel').attr('href');
+				return;
+			}
+
+			msgBox.removeClass('hidden').find('ul').html('<li>'+response.messages.join('</li><li>')+'</li>');
+			$('html, body').animate({scrollTop: 0}, 'slow');
+		})
+		.fail(function(){
+			alert('An internal server error has occured');
 		});
-
-		var total_deduction_amount = 0;
-		$('.deduction_particular_amount').each(function(){
-			total_deduction_amount += Number(($(this).val()).replace(",", ""));
-		});
-		$('.loan_payment_amount').each(function(){
-			total_deduction_amount += Number(($(this).html()).replace(",", ""));
-		});
-		total_deduction_amount += Number($('.late_penalty').html());
-
-		var net_pay = total_additional_amount - total_deduction_amount;
-
-		$('.total_additional').html(commaSeparateNumber(total_additional_amount.toFixed(2)));
-		$('.net_pay').html(commaSeparateNumber(net_pay.toFixed(2)));
-	});*/
-
-	/*$('.particular_rate').on('keyup', function(){
-		console.log('nicole');
-
-		var particular_rate = 0;
-		var particular_days_rendered = 0;
-		var particular_unit = 0
-
-		particular_rate = $(this).val().replace(",", "");
-		particular_days_rendered = $('.particular_days_rendered').html();
-
-		var particular_amount = particular_rate * particular_days_rendered;
-		$(this).parent().parent().find('.particular_amount').html(commaSeparateNumber(particular_amount.toFixed(2)));
-
-		calculate_total_amount();
-	});*/
+	});
 
 	$('form').submit(function(e){
 		e.preventDefault();

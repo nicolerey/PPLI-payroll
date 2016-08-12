@@ -33,6 +33,11 @@ class Loan_model extends CI_Model
 		return $loans;
 	}
 
+	public function get_payments($id)
+	{
+		return $this->db->get_where('payment_terms', ['loan_id' => $id])->result_array();
+	}
+
 	public function insert_loan_payment($payroll_id, $employee_number, $payments)
 	{
 		$loans = $this->all($employee_number);
@@ -95,8 +100,8 @@ class Loan_model extends CI_Model
 			'loan_name' => $data['loan_name'],
 			'loan_date' => date_format(date_create($data['loan_date']), 'Y-m-d H:i:s'),
 			'employee_id' => $data['employee_number'],
-			'loan_amount' => $data['loan_amount'],
-			'loan_minimum_pay' => $data['loan_minimum_pay']
+			'loan_amount' => floatval(str_replace(',', '', $data['loan_amount'])),
+			'loan_minimum_pay' => floatval(str_replace(',', '', $data['loan_minimum_pay']))
 		];
 		return $this->db->insert('loans', $loan_table_data);
 	}

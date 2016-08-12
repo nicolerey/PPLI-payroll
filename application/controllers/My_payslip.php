@@ -251,6 +251,52 @@ class My_payslip extends HR_Controller
 		return;
 	}
 
+	public function unapprove_payslip()
+	{
+		$this->output->set_content_type('json');
+
+		if($this->session->userdata('account_type')=='ad'){
+			$input = $this->input->post();
+			if(empty($input)){
+				$this->output->set_output(json_encode([
+					'result' => FALSE,
+					'messages' => ['No payslip selected.']
+				]));
+				return;
+			}
+
+			$data = [];
+			$result = 0;
+			if(isset($input['checkbox'])){
+				foreach ($input['checkbox'] as $key => $value) {
+					$data[] = [
+						'id' => $value,
+						'approval_status' => FALSE
+					];
+				}
+				$result = $this->payslip->update_payroll_batch_normal($data, "BATCH");
+			}
+			else if(isset($input['id'])){
+				$data = [
+					'id' => $input['id'],
+					'approval_status' => FALSE
+				];
+				$result = $this->payslip->update_payroll_batch_normal($data, "NORMAL");
+			}
+
+			$this->output->set_output(json_encode([
+				'result' => TRUE
+			]));
+			return;
+		}
+
+		$this->output->set_output(json_encode([
+			'result' => FALSE,
+			'messages' => ['No permission to unapprove.']
+		]));
+		return;
+	}
+
 	public function print_payslip($batch_id = FALSE)
 	{
 		$payslips = [];

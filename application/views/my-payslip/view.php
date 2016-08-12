@@ -15,6 +15,10 @@
 </section>
 <section class="content">
 
+  <?php 
+    $user_type = $this->session->userdata('account_type');
+  ?>
+
   <!-- Default box -->
 
   <div class="box box-solid">
@@ -24,14 +28,22 @@
       <div class="box-body">
         <div class="alert alert-danger hidden"><ul class="list-unstyled"></ul></div>
 
+        <?php if($payslip['is_printed']):?>
+          <div class="alert alert-info">This payslip has already been printed.</div>
+        <?php endif;?>
+
         <div class="form-group">
           <label class="col-sm-2 control-label"> Status</label>
           <div class="col-sm-1">
             <p class="form-control-static approval_status"><?= ($payslip['approval_status'])?'Approved':'Pending';?></p>
           </div>
           <div class="col-sm-3">
-            <?php if(!$payslip['approval_status'] && $this->session->userdata('account_type')=='ad'):?>
-              <button type="button" class="btn btn-flat btn-success btn-sm" id="approve_button" data-action="<?= base_url('my_payslip/approve_payslip')?>" data-pk="<?= $payslip['id'];?>"><i class="fa fa-check"></i> Approve payslip</button>
+            <?php if($this->session->userdata('account_type')=='ad'):?>
+              <?php if(!$payslip['approval_status']):?>
+                <button type="button" class="btn btn-flat btn-success btn-sm" id="approve_button" data-action="<?= base_url('my_payslip/approve_payslip')?>" data-pk="<?= $payslip['id'];?>"><i class="fa fa-check"></i> Approve payslip</button>
+              <?php else:?>
+                <button type="button" class="btn btn-flat btn-danger btn-sm" id="unapprove_button" data-action="<?= base_url('my_payslip/unapprove_payslip')?>" data-pk="<?= $payslip['id'];?>"><i class="fa fa-close"></i> Unapprove payslip</button>
+              <?php endif;?>
             <?php endif;?>
           </div>
           <div class="col-sm-2"></div>
@@ -74,7 +86,7 @@
                   <td>Basic Rate</td>
                   <td class="p_type">Daily</td>
                   <td class="basic_rate">
-                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $payslip['current_daily_wage'];?>"/>
+                    <input name="basic_rate"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $payslip['current_daily_wage'];?>"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>/>
                   </td>
                   <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
                   <td style="padding-right: 50px;">day/s</td>
@@ -107,7 +119,7 @@
                       </td>
                       <td class="p_type"><?= $add_type;?></td>
                       <td>
-                        <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $additionals['amount'];?>"/>
+                        <input name="particular_rate[]"  min="0" step="0.01" class="form-control pformat particular_rate" value="<?= $additionals['amount'];?>"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>/>
                       </td>
                       <td class="particular_days_rendered"><?= $payslip['days_rendered'];?></td>
                       <td>
@@ -143,7 +155,7 @@
                   </td>
                   <td class="particular_rate_type p_type">-</td>
                   <td>
-                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate" onkeyup="cha(this);" />
+                    <input name=""  min="0" step="0.01" value="0" class="form-control pformat particular_rate"/>
                   </td>
                   <td>
                     <?= $payslip['days_rendered'];?>
@@ -160,7 +172,7 @@
           </div>
           <div class="col-sm-12">
             <div class="col-sm-2">
-              <button type="button" class="btn btn-flat btn-primary" onclick="add_particular_group(this);">
+              <button type="button" class="btn btn-flat btn-primary" onclick="add_particular_group(this);"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>>
                 <span class="glyphicon glyphicon-plus"></span> Add particular
               </button>
             </div>
@@ -223,7 +235,7 @@
                         <td><?= $payslip['days_rendered'];?></td>
                         <td>day/s</td>
                         <td>
-                          <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount"<?= ($key!=='loan')?'name="particular_rate[]"':'';?>/>
+                          <input  min="0" step="0.01" value="<?= $deductions['amount'];?>" class="form-control pformat deduction_particular_amount"<?= ($key!=='loan')?'name="particular_rate[]"':'';?><?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>/>
                           <?php if($key!=='loan'):?>
                             <input type="hidden" name="particular_id[]" value="<?= $deductions['id']?>"/>
                           <?php endif;?>
@@ -242,7 +254,7 @@
                         <td>
                           <input type="hidden" name="loan_id[]" value="<?= $loan['loan_id'];?>">
                           <input type="hidden" name="loan_payment_id[]" value="<?= $loan['id'];?>">
-                          <input  min="0" step="0.01" value="<?= $loan['payment_amount'];?>" class="form-control pformat deduction_particular_amount" name="loan_payment[]"/>
+                          <input  min="0" step="0.01" value="<?= $loan['payment_amount'];?>" class="form-control pformat deduction_particular_amount" name="loan_payment[]"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>/>
                         </td>
                       </tr>
                     <?php endforeach;?>
@@ -279,7 +291,7 @@
           <div class="row">
             <div class="col-sm-7"></div>
             <div class="col-sm-2">
-              <button type="button" class="btn btn-flat btn-primary" onclick="ded_particular_group();">
+              <button type="button" class="btn btn-flat btn-primary" onclick="ded_particular_group();"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>>
                 <span class="glyphicon glyphicon-plus"></span> Add particular
               </button>
             </div>
@@ -301,7 +313,7 @@
       </div><!-- /.box-body -->
       <div class="box-footer clearfix">
         <a href="<?= base_url('my_payslip/view_payslip/'.$batch_id)?>" class="btn btn-default cancel pull-right btn-flat">Cancel</a>
-        <button type="submit" class="btn btn-success btn-flat">Save payslip</button>
+        <button type="submit" class="btn btn-success btn-flat"<?= ($payslip['approval_status'] && $user_type!='ad')?'disabled':'';?>>Save payslip</button>
       </div><!-- /.box-footer -->
     </form>
   </div><!-- /.box -->

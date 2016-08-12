@@ -45,6 +45,40 @@
             <input name="loan_minimum_pay"  min="0" step="0.01" value="<?= (isset($loan))?$loan['loan_minimum_pay']:'0.00';?>" class="form-control pformat"/>
           </div>
         </div>
+        <?php if(isset($loan_payments)):?>
+          <?php
+            $total = 0;
+          ?>
+          <hr>
+          <div>
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Payment date</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach($loan_payments as $loan_payments_key=>$loan_payments_value):?>
+                  <?php $total += $loan_payments_value['payment_amount'];?>
+                  <tr>
+                    <td><?= str_pad($loan_payments_key, 4, 0, STR_PAD_LEFT);?></td>
+                    <td><?= date_format(date_create($loan_payments_value['payment_date']), 'M d, Y');?></td>
+                    <td><?= number_format($loan_payments_value['payment_amount'], 2);?></td>
+                  </tr>
+                <?php endforeach;?>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td><b class="pull-right">Total:</b></td>
+                  <td>P <?= number_format($total, 2);?></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        <?php endif;?>
         <!-- /.box-body -->
       </div>
       <div class="box-footer clearfix">

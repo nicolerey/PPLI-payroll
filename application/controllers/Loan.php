@@ -86,6 +86,7 @@ class Loan extends HR_Controller
         	'title' => 'Make a loan',
         	'employees' => array_column($employees, 'fullname', 'id'),
         	'loan' => $loan[0],
+        	'loan_payments' => $this->loan->get_payments($id),
         	'action' => "update"
         ]);
 	}

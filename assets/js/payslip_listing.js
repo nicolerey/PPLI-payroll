@@ -1,5 +1,11 @@
 (function($){
 	$(document).ready(function(){
+		$('#general_checkbox').on('change', function(){
+			$('.unapprove_checkbox').each(function(index){
+				$(this).prop('checked', !$(this).prop('checked'));
+			});
+		});
+
 		$('.search_employee').select2();
 
 		$('#search_employee').on('click', function(){

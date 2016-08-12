@@ -4,7 +4,7 @@
     <?php if($this->session->userdata('account_type')=='ad'):?>
       <button type="button" style="margin-right: 5px;" class="btn btn-flat btn-success pull-right btn-sm" id="approve_button"><i class="fa fa-check"></i> Approve selected</button>
     <?php endif;?>
-    <button type="button" style="margin-right: 5px;" class="btn btn-flat btn-primary pull-right btn-sm" id="print_button" data-url="<?= base_url('my_payslip/print_payslip/'.$batch_id);?>"><i class="fa fa-print"></i> Print payslip</button>
+    <button type="button" style="margin-right: 5px;" class="btn btn-flat btn-primary pull-right btn-sm" id="print_button" data-url="<?= base_url('my_payslip/print_payslip/'.$batch_id);?>" onclick="confirm('Are you sure?')"><i class="fa fa-print"></i> Print payslip</button>
   </h1>
 </section>
 <section class="content">
@@ -30,7 +30,7 @@
         	<thead>
   			   <tr>
             <?php if($this->session->userdata('account_type')=='ad'):?>
-              <th></th>
+              <th><input type="checkbox" id="general_checkbox"/></th>
             <?php endif;?>
             <th>#</th><th>Batch ID</th><th>Employee Name</th><th>From</th><th>To</th><th>Status</th>
           </tr>
@@ -42,7 +42,7 @@
         		<?php foreach($items AS $row):?>
         			<tr>
                 <?php if($this->session->userdata('account_type')=='ad'):?>
-                  <td><input type="checkbox" name="checkbox[]" value="<?= $row['id'];?>"<?= ($row['approval_status'])?' disabled':'';?>/></td>
+                  <td><input type="checkbox" name="checkbox[]" class="<?= (!$row['approval_status'])?'unapprove_checkbox':'';?>" value="<?= $row['id'];?>"<?= ($row['approval_status'])?' disabled':'';?>/></td>
                 <?php endif;?>
                 <td><a href="<?= base_url("my_payslip/view/{$row['id']}")?>"><?= str_pad($row['id'], 4, 0, STR_PAD_LEFT)?></a></td>
                 <td><?= $row['batch_id'];?></td>
