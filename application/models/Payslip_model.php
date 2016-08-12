@@ -503,6 +503,7 @@ class Payslip_model extends CI_Model
 	public function get_batches()
 	{
 		$this->db->select('DISTINCT(batch_id), start_date, end_date');
+		$this->db->order_by('end_date', 'DESC');
 		return $this->db->get($this->table)->result_array();
 	}
 
