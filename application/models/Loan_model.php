@@ -113,8 +113,8 @@ class Loan_model extends CI_Model
 			'loan_name' => $data['loan_name'],
 			'loan_date' => date_format(date_create($data['loan_date']), 'Y-m-d H:i:s'),
 			'employee_id' => $data['employee_number'],
-			'loan_amount' => $data['loan_amount'],
-			'loan_minimum_pay' => $data['loan_minimum_pay']
+			'loan_amount' => floatval(str_replace(',', '', $data['loan_amount'])),
+			'loan_minimum_pay' => floatval(str_replace(',', '', $data['loan_minimum_pay']))
 		];
 		$this->db->where('id', $data['id']);
 		return $this->db->update($this->table, $loan_table_data);

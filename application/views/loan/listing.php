@@ -51,7 +51,7 @@
                     <?= date_format(date_create($loan['loan']['loan_date']), 'm/d/Y');?>
                   </td>
                   <td>
-                    <?= $loan['loan']['loan_amount']; ?>
+                    <?= number_format($loan['loan']['loan_amount'], 2); ?>
                   </td>
                   <td>
                   <button type="button" delete_url="<?= base_url('loan/delete/'.$loan['loan']['id']);?>" class="btn btn-flat btn-danger btn-xs" onclick="delete_loan(this);">
