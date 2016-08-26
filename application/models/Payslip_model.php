@@ -66,26 +66,26 @@ class Payslip_model extends CI_Model
 					if($value['day']==$day_in){
 						if(($first_workday_date2>$datetime_in && $first_workday_date2<$datetime_out) && ($second_workday_date1>$datetime_in && $second_workday_date1<$datetime_out)){
 
-							$time_diff = date_diff($first_workday_date2, $datetime_in);
 							if($first_workday_date1<$datetime_in){
 								$late_diff = date_diff($datetime_in, $first_workday_date1);
 								$late = ($late_diff->h * 60) + $late_diff->i + ($late_diff->s / 60);
+								$time_diff = date_diff($first_workday_date2, $datetime_in);
 							}
-							else if($first_workday_date1>$datetime_in)
+							else if($first_workday_date1>=$datetime_in)
 								$time_diff = date_diff($first_workday_date2, $first_workday_date1);
 
-							$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
-							$am_workhours += $workhours;
+							$am_workhours = $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
+							$workhours += $am_workhours;
 
 							if($datetime_out>$second_workday_date2){
 								$time_diff = date_diff($second_workday_date2, $second_workday_date1);
-								$t_d = date_diff($datetime_out, $second_workday_date1);
-								$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->i / 60 / 60));
+								$t_d = date_diff($datetime_out, $second_workday_date2);
+								$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->s / 60 / 60));
 							}
 							else
 								$time_diff = date_diff($datetime_out, $second_workday_date1);
 
-							$hours = $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
+							$hours = $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
 							$workhours += $hours;
 							$pm_workhours += $hours;
 
@@ -102,7 +102,7 @@ class Payslip_model extends CI_Model
 										$time_diff = date_diff($first_workday_date2, $datetime_in);
 									else
 										$time_diff = date_diff($datetime_out, $datetime_in);
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
+									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
 									$am_workhours += $workhours;
 
 									$att_flag = 1;
@@ -114,7 +114,7 @@ class Payslip_model extends CI_Model
 									else
 										$time_diff = date_diff($datetime_out, $first_workday_date1);
 
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
+									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
 									$am_workhours += $workhours;
 
 									$att_flag = 1;
@@ -129,11 +129,11 @@ class Payslip_model extends CI_Model
 									if($datetime_out>$second_workday_date2){
 										$time_diff = date_diff($second_workday_date2, $datetime_in);
 										$t_d = date_diff($datetime_out, $second_workday_date2);
-										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->i / 60 / 60));
+										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->s / 60 / 60));
 									}
 									else
 										$time_diff = date_diff($datetime_out, $datetime_in);
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
+									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
 									$pm_workhours += $workhours;
 
 									$att_flag = 1;
@@ -143,12 +143,12 @@ class Payslip_model extends CI_Model
 									if($datetime_out>$second_workday_date2){
 										$time_diff = date_diff($second_workday_date2, $second_workday_date1);
 										$t_d = date_diff($datetime_out, $second_workday_date2);
-										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->i / 60 / 60));
+										$ot += ($t_d->h + ($t_d->i / 60) + ($t_d->s / 60 / 60));
 									}
 									else
 										$time_diff = date_diff($datetime_out, $second_workday_date1);
 
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->i / 60 / 60);
+									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
 									$pm_workhours += $workhours;
 
 									$att_flag = 1;
@@ -233,18 +233,18 @@ class Payslip_model extends CI_Model
 		$data['regular_overtime_pay'] = $position['daily_rate'] * ($position['overtime_rate'] / 100);
 		if(!empty($emp_att)){
 			foreach ($emp_att as $key => $value) {
-				if($value['total_late']<=$position['allowed_late_period']){
-					$total_late_minutes += $value['total_late'];
-
-					$total_regular_hrs += $value['total_working_hours'];
-
-					$total_overtime_hrs += floor($value['overtime']);
-
-					if($value['total_working_hours']>=$pos_workday[$value['workday_index']]['total_working_hours'])
-						$total_regular_days += 1;
-					else
-						$total_regular_days += $value['total_working_hours'] / $pos_workday[$value['workday_index']]['total_working_hours'];
+				if($value['total_late']>$position['allowed_late_period']){
+					$total_late_minutes += $value['total_late'] - $position['allowed_late_period'];
 				}
+
+				$total_regular_hrs += $value['total_working_hours'];
+
+				$total_overtime_hrs += floor($value['overtime']);
+
+				if($value['total_working_hours']>=$pos_workday[$value['workday_index']]['total_working_hours'])
+					$total_regular_days += 1;
+				else
+					$total_regular_days += $value['total_working_hours'] / $pos_workday[$value['workday_index']]['total_working_hours'];
 			}
 		}
 
@@ -542,10 +542,10 @@ class Payslip_model extends CI_Model
 		return $this->db->update('payroll', ['wage_adjustment' => $amount], ['id' => $id]);
 	}
 
-	public function get_by_employee($id)
+	public function get_by_employee($id, $batch_id)
 	{
 		$this->load->model(['Loan_model' => 'loan']);
-		$data = $this->db->get_where('payroll', ['id' => $id])->row_array();
+		$data = $this->db->get_where('payroll', ['id' => $id, 'batch_id' => $batch_id])->row_array();
 		if($data){
 			$data['particulars'] = ['deductions' => [], 'additionals' => []];
 			$this->db->select('p.id, p.name, p.type, p.particular_type, pp.amount, pp.units');

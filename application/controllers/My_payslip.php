@@ -81,7 +81,9 @@ class My_payslip extends HR_Controller
 	{
 		$this->load->model(['Employee_model' => 'employee', 'Pay_modifier_model' => 'pay_modifier', 'Loan_model' => 'loan']);
 		
-		$payslip = $this->payslip->get_by_employee($id);
+		$last_batch_id = $this->payslip->get_last_batch_id();
+
+		$payslip = $this->payslip->get_by_employee($id, $last_batch_id['batch_id']);
 		$employee = $this->employee->get($payslip['employee_id']);
 
 		$particular_result = $this->employee->get_employee_pay_particulars($payslip['employee_id']);
