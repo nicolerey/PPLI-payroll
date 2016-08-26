@@ -519,7 +519,7 @@ class Payslip_model extends CI_Model
 	public function get_batches()
 	{
 		$this->db->select('DISTINCT(batch_id), start_date, end_date');
-		$this->db->order_by('created_by', 'ASC');
+		$this->db->order_by('created_at', 'DESC');
 		return $this->db->get($this->table)->result_array();
 	}
 
