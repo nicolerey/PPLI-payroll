@@ -65,12 +65,25 @@ class My_payslip extends HR_Controller
 			}
 		}
 
+		$emp_loan = [];
+		$loans = $this->loan->all($input['id']);
+		foreach ($loans as $key => $value) {
+			$payment_total = 0;
+			foreach ($value['payment_terms'] as $payment_terms_key => $payment_terms_value) {
+				$payment_total += $payment_terms_value['payment_amount'];
+			}
+
+			if($payment_total<$value['loan_amount']){
+				array_push($emp_loan, $value);
+			}
+		}
+
 		$data = [
 			'basic_rate' => $emp_position['daily_rate'],
 			'overtime_rate' => $emp_position['overtime_rate'],
 			'late_penalty_rate' => $emp_position['late_penalty'],
 			'emp_particulars' => $position['particulars'],
-			'loans' => $this->loan->all($input['id']),
+			'loans' => $emp_loan,
 			'particulars' => $this->pay_modifier->all($emp_particulars, $pm_flag)
 		];
 

@@ -102,8 +102,8 @@ class Payslip_model extends CI_Model
 										$time_diff = date_diff($first_workday_date2, $datetime_in);
 									else
 										$time_diff = date_diff($datetime_out, $datetime_in);
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
-									$am_workhours += $workhours;
+									$am_workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
+									$workhours += $am_workhours;
 
 									$att_flag = 1;
 								}
@@ -114,8 +114,8 @@ class Payslip_model extends CI_Model
 									else
 										$time_diff = date_diff($datetime_out, $first_workday_date1);
 
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
-									$am_workhours += $workhours;
+									$am_workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
+									$workhours += $am_workhours;
 
 									$att_flag = 1;
 								}
@@ -133,8 +133,8 @@ class Payslip_model extends CI_Model
 									}
 									else
 										$time_diff = date_diff($datetime_out, $datetime_in);
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
-									$pm_workhours += $workhours;
+									$pm_workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
+									$workhours += $pm_workhours;
 
 									$att_flag = 1;
 								}
@@ -148,8 +148,8 @@ class Payslip_model extends CI_Model
 									else
 										$time_diff = date_diff($datetime_out, $second_workday_date1);
 
-									$workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
-									$pm_workhours += $workhours;
+									$pm_workhours += $time_diff->h + ($time_diff->i / 60) + ($time_diff->s / 60 / 60);
+									$workhours += $pm_workhours;
 
 									$att_flag = 1;
 								}
@@ -210,21 +210,17 @@ class Payslip_model extends CI_Model
 			}
 		}
 
-		array_map(function($var) USE(&$data){
-			if($var['type'] === 'a'){
-				$data['additionals'][] = $var;
-				if($var['particular_type'] === 'd')
-					$data['total_daily_additionals']  += $var['amount'];
-				else if($var['particular_type'] === 'm')
-					$data['total_monthly_additionals']  += $var['amount'];
-				return;
-			}
-			$data['deductions'][] = $var;
-			if($var['particular_type'] === 'd')
-				$data['total_daily_deductions']  += $var['amount'];
-			else if($var['particular_type'] === 'm')
-				$data['total_monthly_deductions']  += $var['amount'];
-		}, $employee_data['particulars']);
+		foreach ($employee_data['particulars'] as $key => $value) {
+			if($value['type'] === 'a')
+				$data['additionals'][] = $value;
+			else
+				$data['deductions'][] = $value;
+
+			if($value['particular_type'] === 'd')
+				$data['total_daily_deductions'] += $value['amount'];
+			else if($value['particular_type'] === 'm')
+				$data['total_monthly_deductions'] += $value['amount'];
+		}
 
 		$total_overtime_hrs = 0;
 		$total_regular_hrs = 0;
