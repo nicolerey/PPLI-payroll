@@ -52,8 +52,8 @@ class Loan extends HR_Controller
 		}
 
 		$this->import_plugin_script(['bootstrap-datepicker/js/bootstrap-datepicker.min.js']);
-		$this->import_page_script(['listing-loan.js']);
-		$this->generate_page('loan/listing', ['data' => $data, 'search_employee' => $search_employee]);
+		$this->import_page_script(['listing-loan.js', 'select2.min.js']);
+		$this->generate_page('loan/listing', ['data' => $data, 'search_employee' => $search_employee, 'employee' => $this->employee->all()]);
 	}
 
 	public function create()

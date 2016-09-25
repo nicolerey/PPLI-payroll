@@ -12,12 +12,15 @@
       <div class="box-body">
         <div class="form-group">
           <form class="form-inline" method="GET" action="<?= current_url()?>">
-            <?php //if(isset($search_employee)):?>
-               <div class="form-group">
-                  <label>Employee number</label>
-                  <input type="number" class="form-control" name="employee_number" value="<?= $this->input->get('employee_number')?>">
-                </div>
-            <?php //endif;?>
+            <div class="form-group">
+              <label>Employee number</label>
+              <select class="search_employee form-control" name="employee_number">
+                <option value=""></option>
+                <?php foreach($employee as $emp):?>
+                  <option value="<?= $emp['id'];?>"><?= "{$emp['lastname']}, {$emp['firstname']} {$emp['middleinitial']}."?></option>
+                <?php endforeach;?>
+              </select>
+            </div>
             <div class="form-group">
               <label for="start-date">Start date</label>
               <input type="text" class="form-control datepicker" id="start-date" name="start_date" value="<?= $this->input->get('start_date')?>">

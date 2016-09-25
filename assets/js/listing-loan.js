@@ -17,5 +17,6 @@ function delete_loan(element){
 }
 
 $(document).ready(function(){	
+    $('.search_employee').select2();
 	$('.datepicker').datepicker();
 });
